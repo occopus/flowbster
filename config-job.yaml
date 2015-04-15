@@ -1,0 +1,14 @@
+
+jobid: unique-id-of-the-job
+inputs:
+    -
+        name: one_file
+        content: |
+            lorem ipsum
+            dolor
+    -
+        name: two_file
+        content: |
+            sit amet
+            luna
+
