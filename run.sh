@@ -1,7 +1,7 @@
 
 #!/bin/sh
 
-python jobflow_submit.py
+python jobflow.py
 
 
 
