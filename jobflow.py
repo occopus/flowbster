@@ -23,13 +23,16 @@ print "Job dir: "+jobflow_submit.get_jobdirroot()
 
 @app.route(routepath)
 def submit():
-    jobid = str(uuid.uuid1())
+    jobid = jobflow_submit.get_jobid_by_wfid(confjob)
     jobflow_submit.submit(jobid,confjob,confapp)
+    print jobid
     return jobid
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
 
 #submit()
+#print jobflow_submit.get_jobid_by_wfid(confjob)
+
 
 
