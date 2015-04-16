@@ -4,6 +4,7 @@ import jobflow_submit
 import uuid
 import os
 
+routepath = "/jobflow"
 app = Flask(__name__)
 
 def readconfig(pathtoconfig):
@@ -17,7 +18,10 @@ jobflow_submit.set_jobdirroot(confsys['jobdirroot'])
 confjob = dict(readconfig('config-job.yaml'))
 confapp = dict(readconfig('config-app.yaml'))
 
-@app.route("/jobflow")
+print "Listening on port 5000, under url \""+routepath+"\""
+print "Job dir: "+jobflow_submit.get_jobdirroot()
+
+@app.route(routepath)
 def submit():
     jobid = str(uuid.uuid1())
     jobflow_submit.submit(jobid,confjob,confapp)
