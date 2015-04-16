@@ -5,14 +5,19 @@ import uuid
 
 import jobflow_exec
 
-sysconfpath = os.path.join('config-sys.yaml')
+def set_jobdirroot(path):
+    global jobdirroot
+    jobdirroot = path
 
-def readconfig(pathtoconfig):
-    with open(pathtoconfig, 'r') as f:
-        return yaml.load(f)
+def get_jobdirroot():
+    return jobdirroot
 
-def get_jobdirroot(config):
-    return config['jobdirroot']
+def get_jobdir(jobid):
+    return os.path.join(jobdirroot,jobid)
+
+def get_sandboxdir(jobid):
+    jobdir = get_jobdir(jobid)
+    return os.path.join(jobdir,'sandbox')
 
 def get_exe_name(config):
     return config['executable']['filename']
@@ -20,17 +25,11 @@ def get_exe_name(config):
 def get_args(config):
     return config['arguments']
 
-def get_sandboxdir(jobdir):
-    return os.path.join(jobdir,'sandbox')
-
 def create_dir(path):
     if not os.path.exists(path): os.makedirs(path)
 
-confsys = dict(readconfig(sysconfpath))
-jobdirroot = get_jobdirroot(confsys)
-
-def submit(jobid,confjob,confapp):
-    jobdir =  os.path.join(jobdirroot,jobid)
+def deploy(jobid,confjob,confapp):
+    jobdir = get_jobdir(jobid)
     create_dir(jobdir)
 
     fw = open(os.path.join(jobdir,"config-job.yaml"), "wb")
@@ -41,22 +40,21 @@ def submit(jobid,confjob,confapp):
     fw.write(yaml.dump(confapp));
     fw.close()
 
-    sandboxdir = get_sandboxdir(jobdir)
+    sandboxdir = get_sandboxdir(jobid)
     create_dir(sandboxdir)
 
-    exename = get_exe_name(confapp)
-    arguments = get_args(confapp)
-
-    create_dir(sandboxdir)
+def execute(jobid,confjob,confapp):
+    sandboxdir = get_sandboxdir(jobid)
     jobflow_exec.create_input_files(confjob,confapp,sandboxdir)
     jobflow_exec.create_executable(confapp,sandboxdir)
+    
+    exename = get_exe_name(confapp)
+    arguments = get_args(confapp)
     jobflow_exec.perform_exec(sandboxdir,exename,arguments)
 
-jobid = str(uuid.uuid1())
-confjob = dict(readconfig('config-job.yaml'))
-confapp = dict(readconfig('config-app.yaml'))
-
-submit(jobid,confjob,confapp)
+def submit(jobid,confjob,confapp):
+    deploy(jobid,confjob,confapp)
+    execute(jobid,confjob,confapp)
 
 
 
