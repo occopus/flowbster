@@ -1,5 +1,5 @@
 
-jobid: unique-id-of-the-job
+wfid: unique-id-of-the-job
 inputs:
     -
         name: one_file
