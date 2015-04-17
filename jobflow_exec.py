@@ -28,10 +28,10 @@ def find_job_to_run(jobdirroot):
         found = True
         confapppath = os.path.join(jobdirroot,name,'config-app.yaml')
         if not os.path.exists(confapppath):
-            break
+            continue
 
         if os.path.exists(os.path.join(jobdirroot,name,'retcode')):
-            break
+            continue
 
         confapp = dict(readconfig(confapppath))
         inputlist = confapp['inputs']
@@ -47,17 +47,21 @@ def find_job_to_run(jobdirroot):
     return (False,False,False)
 
 def exec_one_job():
-    
+    print "Looking for a job to be executed at \""+jobdirroot+"\""
     (jobdir,exename,arguments) = find_job_to_run(jobdirroot)
     if jobdir:
-        print jobdir
-        print exename
-        print arguments
+        print "Found job to execute at \""+jobdir+"\""
         sandboxdir = os.path.join(jobdir,'sandbox')
         perform_exec(sandboxdir,exename,arguments)
-
+        print "Execution done."
+        return jobdir
+    else:
+        print "No job found to be executed."
+        return False
 
 exec_one_job()
+
+
 
 
 
