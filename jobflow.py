@@ -1,4 +1,6 @@
 from flask import Flask
+from flask import request
+
 import yaml
 import jobflow_submit
 import uuid
@@ -21,8 +23,11 @@ confapp = dict(readconfig('config-app.yaml'))
 print "Listening on port 5000, under url \""+routepath+"\""
 print "Job dir: "+jobflow_submit.get_jobdirroot()
 
-@app.route(routepath)
+@app.route(routepath,methods=['POST'])
 def submit():
+
+    rdata = request.get_data()
+    confjob = dict(yaml.load(rdata))
     jobid = jobflow_submit.get_jobid_by_wfid(confjob)
     jobflow_submit.submit(jobid,confjob,confapp)
     print jobid
