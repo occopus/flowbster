@@ -1,7 +1,7 @@
 
 #!/bin/sh
 
-python jobflow.py
+python jobflow_receiver.py
 
 
 
