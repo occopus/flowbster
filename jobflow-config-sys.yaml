@@ -1,0 +1,37 @@
+
+sleepinterval: 2
+jobdirroot: tmp
+
+logging:
+    version: 1
+    root:
+        level: INFO
+        handlers: [console, file]
+    formatters:
+        simpleFormatter:
+            format: "%(asctime)s\t%(name)s\t%(levelname)s\t%(message)s"
+            #datefmt: '%Y-%m-%d %H:%M:%S.%f'
+
+    handlers:
+        console:
+            class: logging.StreamHandler
+            formatter: simpleFormatter
+            level: DEBUG
+            stream: ext://sys.stdout
+        file:
+            class : logging.FileHandler
+            formatter: simpleFormatter
+            mode: w
+            level: DEBUG
+            filename: rabbit.log
+
+    loggers:
+        pika:
+            propagate: false
+            level: ERROR
+            handlers: [console]
+        jobflow:
+            propagate: false
+            level: DEBUG
+            handlers: [console, file]
+
