@@ -1,11 +1,13 @@
 
 sleepinterval: 2
 jobdirroot: tmp
+listeningport: 6000
+appconfigpath: etc/config-app.yaml
 
 logging:
     version: 1
     root:
-        level: INFO
+        level: DEBUG
         handlers: [console, file]
     formatters:
         simpleFormatter:
