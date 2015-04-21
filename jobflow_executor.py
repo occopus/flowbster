@@ -36,7 +36,7 @@ def find_job_to_run(jobdirroot):
             log.debug("\"retcode\" found. Nothing to be executed. Skipping...")
             continue
 
-        confapp = dict(readconfig(confapppath))
+        confapp = readconfig(confapppath))
         inputlist = confapp['inputs']
         for k in inputlist:
             inputfilepath = os.path.join(jobdirroot,name,"sandbox",k['name'])
