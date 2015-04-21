@@ -1,6 +1,9 @@
 import yaml
 import os,sys,stat
 import subprocess
+import logging
+import logging.config
+import time
 
 def readconfig(pathtoconfig):
     with open(pathtoconfig, 'r') as f:
@@ -13,12 +16,9 @@ def save_a_file(directory,name,content):
     fo.close()
     return fullpath
 
-sysconfpath = os.path.join('config-sys.yaml')
-confsys = dict(readconfig(sysconfpath))
-jobdirroot = confsys['jobdirroot']
-
 def perform_exec(sandboxdir,exename,arguments):
     os.chdir(sandboxdir)
+    log.info("Executing \""+exename+' '+arguments+'>../stdout 2>../stderr')
     status = subprocess.call('./'+exename+' '+arguments+'>../stdout 2>../stderr',shell=True)
     save_a_file('..','retcode',str(status))
 
@@ -28,9 +28,12 @@ def find_job_to_run(jobdirroot):
         found = True
         confapppath = os.path.join(jobdirroot,name,'config-app.yaml')
         if not os.path.exists(confapppath):
+            log.debug("Cannot find file: \""+confapppath+"\". Ignoring directory.")
             continue
 
+        log.debug("Examining directory: \""+os.path.join(jobdirroot,name)+"\"")
         if os.path.exists(os.path.join(jobdirroot,name,'retcode')):
+            log.debug("\"retcode\" found. Nothing to be executed. Skipping...")
             continue
 
         confapp = dict(readconfig(confapppath))
@@ -38,6 +41,7 @@ def find_job_to_run(jobdirroot):
         for k in inputlist:
             inputfilepath = os.path.join(jobdirroot,name,"sandbox",k['name'])
             if not os.path.exists(inputfilepath):
+                log.debug("Input file \""+inputfilepath+"\" is still missing. Skipping...")
                 found = False
 
         if found:
@@ -47,19 +51,33 @@ def find_job_to_run(jobdirroot):
     return (False,False,False)
 
 def exec_one_job():
-    print "Looking for a job to be executed at \""+jobdirroot+"\""
+    log.info("Looking for a job to be executed at \""+jobdirroot+"\"")
     (jobdir,exename,arguments) = find_job_to_run(jobdirroot)
     if jobdir:
-        print "Found job to execute at \""+jobdir+"\""
+        log.info("Found job to execute at \""+jobdir+"\"")
         sandboxdir = os.path.join(jobdir,'sandbox')
         perform_exec(sandboxdir,exename,arguments)
-        print "Execution done."
+        log.info("Execution done.")
         return jobdir
     else:
-        print "No job found to be executed."
+        log.info("No job found to be executed.")
         return False
 
-exec_one_job()
+
+
+def loadconfig():
+    global confsys, jobdirroot, log
+    sysconfpath = os.path.join(sys.prefix,'etc','jobflow-config-sys.yaml')
+    confsys = readconfig(sysconfpath)
+    jobdirroot = os.path.join(sys.prefix,confsys['jobdirroot'])
+    logging.config.dictConfig(confsys['logging'])
+    log = logging.getLogger("Jobflow.Executor")
+
+
+loadconfig()
+while True:
+    exec_one_job()
+    time.sleep(confsys['sleepinterval'])
 
 
 
