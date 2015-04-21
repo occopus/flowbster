@@ -4,6 +4,8 @@ import subprocess
 import uuid
 from flask import Flask
 from flask import request
+import logging
+import logging.config
 
 def readconfig(pathtoconfig):
     with open(pathtoconfig, 'r') as f:
@@ -12,16 +14,6 @@ def readconfig(pathtoconfig):
 def set_jobdirroot(path):
     global jobdirroot
     jobdirroot = path
-
-sysconfpath = os.path.join('config-sys.yaml')
-confsys = dict(readconfig(sysconfpath))
-set_jobdirroot(confsys['jobdirroot'])
-
-confjob = dict(readconfig('config-job.yaml'))
-confapp = dict(readconfig('config-app.yaml'))
-
-routepath = "/jobflow"
-app = Flask(__name__)
 
 def get_jobdirroot():
     return jobdirroot
@@ -56,14 +48,16 @@ def create_input_files(confjob,confapp,directory):
         for d in confjob['inputs']:
             if d['name'] == filename:
                 save_a_file(directory,filename,d['content'])
+                log.debug("- inputfile: "+filename)
+
 
 def create_executable(confapp,directory):
     filepath = save_a_file(directory,confapp['executable']['filename'],confapp['executable']['content'])
     st = os.stat(filepath)
     os.chmod(filepath, st.st_mode | stat.S_IEXEC)
+    log.debug("- executable: "+confapp['executable']['filename'])
 
 def get_jobid_by_wfid(confjob):
-    #search through existing jobs directories
     jobid = str(uuid.uuid1())
     wfidstr=confjob['wfid']
     jobdirroot=get_jobdirroot()
@@ -71,7 +65,7 @@ def get_jobid_by_wfid(confjob):
     for name in dirs:
        wfidfile = os.path.join(jobdirroot,name,'wfid='+wfidstr)
        if os.path.exists(wfidfile):
-           jobid = name
+           return name
 
     return jobid
 
@@ -79,6 +73,7 @@ def deploy(jobid,confjob,confapp):
     jobdir = get_jobdir(jobid)
     create_dir(jobdir)
     wfidstr = confjob['wfid']
+    log.debug("- wfid: "+wfidstr)
     fw = open(os.path.join(jobdir,"wfid="+wfidstr), "wb")
     fw.write(wfidstr);
     fw.close()
@@ -92,6 +87,7 @@ def deploy(jobid,confjob,confapp):
     fw = open(os.path.join(jobdir,confjobname), "wb")
     fw.write(yaml.dump(confjob));
     fw.close()
+    log.debug("- jobconfig file: "+confjobname)
     
     fw = open(os.path.join(jobdir,"config-app.yaml"), "wb")
     fw.write(yaml.dump(confapp));
@@ -100,26 +96,37 @@ def deploy(jobid,confjob,confapp):
     create_dir(sandboxdir)
     create_executable(confapp,sandboxdir)
     create_input_files(confjob,confapp,sandboxdir)
-   
+    log.info("Job deployment finished.")
+
+def init():
+    global confsys, app, confapp, routepath, log
+    sysconfpath = os.path.join(sys.prefix,'etc','jobflow-config-sys.yaml')
+    confsys = readconfig(sysconfpath)
+    log = logging.config.dictConfig(confsys['logging'])
+    log = logging.getLogger("Jobflow.Receiver")
+    set_jobdirroot(os.path.join(sys.prefix,confsys['jobdirroot']))
+    confapp = readconfig(os.path.join(sys.prefix,confsys['appconfigpath']))
+
+routepath = "/jobflow"
+app = Flask(__name__)
+ 
 @app.route(routepath,methods=['POST'])
 def receive():
-
+    log.info("New job arrived.")
     rdata = request.get_data()
-    print "aaa"
-    confjob = dict(yaml.load(rdata))
-    print str(confjob)
+    confjob = yaml.load(rdata)
     jobid = get_jobid_by_wfid(confjob)
-    print jobid
+    log.info("Assigned jobid is \""+jobid+"\"")
     deploy(jobid,confjob,confapp)
-    print jobid
     return jobid
 
-
-print "Listening on port 5000, under url \""+routepath+"\""
-print "Job dir: "+get_jobdirroot()
+init()
+log.info("App config: "+os.path.join(sys.prefix,confsys['appconfigpath']))
+log.info("Job directory: "+get_jobdirroot())
+log.info("Listening on port "+str(confsys['listeningport'])+", under url \""+routepath+"\"")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0',port=confsys['listeningport'])
 
 
 
