@@ -1,10 +1,10 @@
 
-sleepinterval: 4
-jobdirroot: tmp/
+sleepinterval: 5
+jobdirroot: tmp/jobs/
 listeningport: 5000
 appconfigpath: etc/config-app.yaml
 
-jobdirroot-collector: etc/
+jobdirroot-collector: tmp/results/
 listeningport-collector: 5001
 
 logging:
