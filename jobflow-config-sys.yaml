@@ -1,7 +1,7 @@
 
-sleepinterval: 2
+sleepinterval: 4
 jobdirroot: tmp
-listeningport: 6000
+listeningport: 5000
 appconfigpath: etc/config-app.yaml
 
 logging:
@@ -25,15 +25,38 @@ logging:
             formatter: simpleFormatter
             mode: w
             level: DEBUG
-            filename: rabbit.log
+            filename: jobflow-root.log
+        file-jobflow-receiver:
+            class : logging.FileHandler
+            formatter: simpleFormatter
+            mode: w
+            level: DEBUG
+            filename: jobflow-receiver.log
+        file-jobflow-executor:
+            class : logging.FileHandler
+            formatter: simpleFormatter
+            mode: w
+            level: DEBUG
+            filename: jobflow-executor.log
+        file-jobflow-forwarder:
+            class : logging.FileHandler
+            formatter: simpleFormatter
+            mode: w
+            level: DEBUG
+            filename: jobflow-forwarder.log
+
 
     loggers:
-        pika:
-            propagate: false
-            level: ERROR
-            handlers: [console]
-        jobflow:
+        jobflow.receiver:
             propagate: false
             level: DEBUG
-            handlers: [console, file]
+            handlers: [console, file-jobflow-receiver]
+        jobflow.executor:
+            propagate: false
+            level: DEBUG
+            handlers: [console, file-jobflow-executor]
+        jobflow.forwarder:
+            propagate: false
+            level: DEBUG
+            handlers: [console, file-jobflow-forwarder]
 
