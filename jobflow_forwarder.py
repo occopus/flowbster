@@ -1,6 +1,9 @@
 import requests
 import yaml
 import os,sys,stat
+import logging
+import logging.config
+import time
 
 def readconfig(pathtoconfig):
     with open(pathtoconfig, 'r') as f:
@@ -17,6 +20,7 @@ def perform_sending_content(url,content):
     try:
         r = requests.post(url, data=yaml.dump(content))
     except:
+        log.exception('')
         return False
     return True
 
@@ -41,21 +45,23 @@ def find_output_to_forward(jobdirroot):
         return False
 
 def forward_outputs(jobdir):
-    job_config = dict(readconfig(os.path.join(jobdir,"config-job.yaml")))
+    job_config = readconfig(os.path.join(jobdir,"config-job.yaml"))
     if not job_config.has_key("wfid"):
-        print "ERROR: key \'wfid\' not found in config-job.yaml"
+        log.error("Key \'wfid\' not found in config-job.yaml")
         return False
     wfid = job_config.get("wfid")
 
-    app_config = dict(readconfig(os.path.join(jobdir,"config-app.yaml")))
+    app_config = readconfig(os.path.join(jobdir,"config-app.yaml"))
     if not app_config.has_key("outputs"):
-        print "ERROR: key \'outputs\' not found in config-app.yaml"
+        log.error("Key \'outputs\' not found in config-app.yaml")
         return False
     outputs = app_config.get("outputs")
 
     forward_success = True
     for ind, out in enumerate(outputs):
+        log.debug("Checking output: \""+out.get("name")+"\"")
         if os.path.exists(os.path.join(jobdir,'output-forwarded-'+str(ind))):
+            log.debug("Output \""+out.get("name")+"\" has already been forwarded as \""+out.get("targetname")+"\"")
             continue
        
         url = out.get("targeturl")
@@ -73,14 +79,14 @@ def forward_outputs(jobdir):
             save_a_file(jobdir,'output-content-'+str(ind)+'.yaml',content)
             save_a_file(jobdir,'output-url-'+str(ind)+'.txt',url)
           
-        print "Sending content for \""+out.get("targetname")+"\" to \""+url+"\""
-        content = dict(readconfig(os.path.join(jobdir,'output-content-'+str(ind)+'.yaml')))
+        log.info("Sending content for \""+out.get("targetname")+"\" to \""+url+"\"")
+        content = readconfig(os.path.join(jobdir,'output-content-'+str(ind)+'.yaml'))
         success = perform_sending_content(url,content)
         if success:
             save_a_file(jobdir,'output-forwarded-'+str(ind),'done')
-            print "Sending: SUCCESS."
+            log.info("Sending: SUCCESS.")
         else:
-            print "Sending: FAILED. Will retry later."
+            log.info("Sending: FAILED. Will retry later.")
             forward_success = False
     if forward_success:
         save_a_file(jobdir,'output-forwarded','done')
@@ -90,24 +96,30 @@ def forward_outputs(jobdir):
 
 
 def forward_one_output():
-    print "Looking for an output to be forwarded at \""+jobdirroot+"\""
+    log.info("Looking for an output to be forwarded at \""+jobdirroot+"\"")
     jobdir = find_output_to_forward(jobdirroot)
     if jobdir:
-        print "Found output to forward at \""+jobdir+"\""
+        log.info("Found output to forward at \""+jobdir+"\"")
         forward_outputs(jobdir)
-        print "Forward finished."
+        log.info("Forward finished.")
         return jobdir
     else:
-        print "No output found to be forwarded."
+        log.info("No output found to be forwarded.")
         return False
 
 
-url = "http://192.168.153.107:5000/jobflow"
-filetosend = "config-job.yaml"
+def loadconfig():
+    global confsys, jobdirroot, log
+    sysconfpath = os.path.join(sys.prefix,'etc','jobflow-config-sys.yaml')
+    confsys = readconfig(sysconfpath)
+    jobdirroot = os.path.join(sys.prefix,confsys['jobdirroot'])
+    logging.config.dictConfig(confsys['logging'])
+    log = logging.getLogger("jobflow.forwarder")
 
-sysconfpath = os.path.join('config-sys.yaml')
-confsys = dict(readconfig(sysconfpath))
-jobdirroot = confsys['jobdirroot']
 
-forward_one_output()
+
+loadconfig()
+while True:
+    forward_one_output()
+    time.sleep(confsys['sleepinterval'])
 
