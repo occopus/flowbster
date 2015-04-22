@@ -1,8 +1,11 @@
 
 sleepinterval: 4
-jobdirroot: tmp
+jobdirroot: tmp/
 listeningport: 5000
 appconfigpath: etc/config-app.yaml
+
+jobdirroot-collector: etc/
+listeningport-collector: 5001
 
 logging:
     version: 1
