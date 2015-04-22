@@ -1,23 +1,32 @@
 import requests
 import yaml
-import os,sys,stat
+import sys
 
-url = "http://192.168.153.107:6000/jobflow"
-filetosend = os.path.join(sys.prefix,"etc","config-job.yaml")
+def printhelp():
+    print "Usage: jobflow_submitter [file] [url]"
+    print "  file: containing jobflow definition"
+    print "  url : endpoint of a jobflow_receiver component"
 
-def readconfig(pathtoconfig):
-    with open(pathtoconfig, 'r') as f:
-        return yaml.load(f)
-
-sysconfpath = os.path.join(sys.prefix,'etc','jobflow-config-sys.yaml')
-confsys = readconfig(sysconfpath)
-
-def perform_sending_content(url,content):
-    r = requests.post(url, data=yaml.dump(content))
-
-def submit_a_job():
-    perform_sending_content(url,readconfig(filetosend))
+def parse_arguments():
+    if len(sys.argv)!=3:
+        print "Wrong number of arguments!"
+        printhelp()
+        return (False,False)
+    return (sys.argv[1],sys.argv[2])
 
 
-submit_a_job()
+(path,url) = parse_arguments()
+if path:
+    try:
+        file = open(path,'r')
+        content = yaml.load(file)
+    except Exception as e:
+        print "Error when reading file: %s" % e
+        sys.exit(1)
+            
+    try:
+        requests.post(url, data=yaml.dump(content))
+    except requests.exceptions.RequestException as e:
+        print "Error when posting message: %s" % e
+        sys.exit(1)
 
