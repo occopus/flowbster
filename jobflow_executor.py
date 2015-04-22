@@ -71,7 +71,7 @@ def loadconfig():
     confsys = readconfig(sysconfpath)
     jobdirroot = os.path.join(sys.prefix,confsys['jobdirroot'])
     logging.config.dictConfig(confsys['logging'])
-    log = logging.getLogger("Jobflow.Executor")
+    log = logging.getLogger("jobflow.executor")
 
 
 loadconfig()
