@@ -50,7 +50,6 @@ def create_input_files(confjob,confapp,directory):
                 save_a_file(directory,filename,d['content'])
                 log.debug("- inputfile: "+filename)
 
-
 def create_executable(confapp,directory):
     filepath = save_a_file(directory,confapp['executable']['filename'],confapp['executable']['content'])
     st = os.stat(filepath)
@@ -66,7 +65,6 @@ def get_jobid_by_wfid(confjob):
        wfidfile = os.path.join(jobdirroot,name,'wfid='+wfidstr)
        if os.path.exists(wfidfile):
            return name
-
     return jobid
 
 def deploy(jobid,confjob,confapp):
@@ -98,12 +96,12 @@ def deploy(jobid,confjob,confapp):
     create_input_files(confjob,confapp,sandboxdir)
     log.info("Job deployment finished.")
 
-def init():
+def loadconfig():
     global confsys, app, confapp, routepath, log
     sysconfpath = os.path.join(sys.prefix,'etc','jobflow-config-sys.yaml')
     confsys = readconfig(sysconfpath)
     log = logging.config.dictConfig(confsys['logging'])
-    log = logging.getLogger("Jobflow.Receiver")
+    log = logging.getLogger("jobflow.receiver")
     set_jobdirroot(os.path.join(sys.prefix,confsys['jobdirroot']))
     confapp = readconfig(os.path.join(sys.prefix,confsys['appconfigpath']))
 
@@ -120,7 +118,7 @@ def receive():
     deploy(jobid,confjob,confapp)
     return jobid
 
-init()
+loadconfig()
 log.info("App config: "+os.path.join(sys.prefix,confsys['appconfigpath']))
 log.info("Job directory: "+get_jobdirroot())
 log.info("Listening on port "+str(confsys['listeningport'])+", under url \""+routepath+"\"")
