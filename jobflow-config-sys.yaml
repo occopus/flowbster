@@ -1,10 +1,10 @@
 
 sleepinterval: 5
-jobdirroot: tmp/jobs/
+jobdirroot: /tmp/jobflow/jobs/
 listeningport: 5000
-appconfigpath: etc/config-app.yaml
+appconfigpath: /etc/jobflow-config-app.yaml
 
-jobdirroot-collector: tmp/results/
+jobdirroot-collector: /tmp/jobflow/results/
 listeningport-collector: 5001
 
 logging:

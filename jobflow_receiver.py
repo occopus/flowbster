@@ -98,12 +98,12 @@ def deploy(jobid,confjob,confapp):
 
 def loadconfig():
     global confsys, app, confapp, routepath, log
-    sysconfpath = os.path.join(sys.prefix,'etc','jobflow-config-sys.yaml')
+    sysconfpath = os.path.join('/etc','jobflow-config-sys.yaml')
     confsys = readconfig(sysconfpath)
     log = logging.config.dictConfig(confsys['logging'])
     log = logging.getLogger("jobflow.receiver")
     set_jobdirroot(os.path.join(sys.prefix,confsys['jobdirroot']))
-    confapp = readconfig(os.path.join(sys.prefix,confsys['appconfigpath']))
+    confapp = readconfig(confsys['appconfigpath'])
 
 routepath = "/jobflow"
 app = Flask(__name__)
