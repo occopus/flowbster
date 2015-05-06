@@ -67,9 +67,10 @@ def exec_one_job():
 
 def loadconfig():
     global confsys, jobdirroot, log
-    sysconfpath = os.path.join(sys.prefix,'etc','jobflow-config-sys.yaml')
+    sysconfpath = os.path.join('/etc','jobflow-config-sys.yaml')
     confsys = readconfig(sysconfpath)
-    jobdirroot = os.path.join(sys.prefix,confsys['jobdirroot'])
+    jobdirroot = os.path.join(confsys['jobdirroot'])
+    if not os.path.exists(jobdirroot): os.makedirs(jobdirroot)
     logging.config.dictConfig(confsys['logging'])
     log = logging.getLogger("jobflow.executor")
 
