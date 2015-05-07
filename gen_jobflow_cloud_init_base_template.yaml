@@ -14,6 +14,7 @@ packages:
 
 runcmd:
     - pip install Flask
+    - /home/jobflow/jobflow-run.sh
 
 write_files:
     - permissions: '0644'
@@ -28,6 +29,10 @@ write_files:
       content: "content:jobflow_forwarder.py"
       path: /home/jobflow/jobflow_forwarder.py
     
+    - permissions: '0744'
+      content: "content:jobflow-run.sh"
+      path: /home/jobflow/jobflow-run.sh
+
     - permissions: '0644'
       content: "content:jobflow-config-sys.yaml"
       path: /etc/jobflow-config-sys.yaml
@@ -35,7 +40,6 @@ write_files:
     - permissions: '0644'
       content: "content:jobflow-config-app.yaml"
       path: /etc/jobflow-config-app.yaml
-
 
 
 
