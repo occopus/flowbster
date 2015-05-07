@@ -65,17 +65,19 @@ def exec_one_job():
 
 
 
-def loadconfig():
+def loadconfig(sysconfpath):
     global confsys, jobdirroot, log
-    sysconfpath = os.path.join('/etc','jobflow-config-sys.yaml')
     confsys = readconfig(sysconfpath)
     jobdirroot = os.path.join(confsys['jobdirroot'])
     if not os.path.exists(jobdirroot): os.makedirs(jobdirroot)
     logging.config.dictConfig(confsys['logging'])
     log = logging.getLogger("jobflow.executor")
 
+if len(sys.argv)==3 and sys.argv[1]=="-c":
+    loadconfig(sys.argv[2])
+else:
+    loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
 
-loadconfig()
 while True:
     exec_one_job()
     time.sleep(confsys['sleepinterval'])

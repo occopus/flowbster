@@ -51,13 +51,12 @@ def deploy(confjob):
     create_input_files(confjob,wfiddir)
     log.info("File collection finished.")
 
-def loadconfig():
+def loadconfig(sysconfpath):
     global confsys, app, confapp, routepath, log
-    sysconfpath = os.path.join(sys.prefix,'etc','jobflow-config-sys.yaml')
     confsys = readconfig(sysconfpath)
     log = logging.config.dictConfig(confsys['logging'])
     log = logging.getLogger("jobflow.collector")
-    set_jobdirroot(os.path.join(sys.prefix,confsys['jobdirroot-collector']))
+    set_jobdirroot(confsys['jobdirroot-collector'])
 
 routepath = "/jobflow"
 app = Flask(__name__)
@@ -70,7 +69,11 @@ def receive():
     deploy(confjob)
     return "ok"
 
-loadconfig()
+if len(sys.argv)==3 and sys.argv[1]=="-c":
+    loadconfig(sys.argv[2])
+else:
+    loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
+
 log.info("Job directory: "+get_jobdirroot())
 log.info("Listening on port "+str(confsys['listeningport-collector'])+", under url \""+routepath+"\"")
 

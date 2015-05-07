@@ -96,13 +96,12 @@ def deploy(jobid,confjob,confapp):
     create_input_files(confjob,confapp,sandboxdir)
     log.info("Job deployment finished.")
 
-def loadconfig():
+def loadconfig(sysconfpath):
     global confsys, app, confapp, routepath, log
-    sysconfpath = os.path.join('/etc','jobflow-config-sys.yaml')
     confsys = readconfig(sysconfpath)
     log = logging.config.dictConfig(confsys['logging'])
     log = logging.getLogger("jobflow.receiver")
-    set_jobdirroot(os.path.join(sys.prefix,confsys['jobdirroot']))
+    set_jobdirroot(confsys['jobdirroot'])
     confapp = readconfig(confsys['appconfigpath'])
 
 routepath = "/jobflow"
@@ -118,8 +117,12 @@ def receive():
     deploy(jobid,confjob,confapp)
     return jobid
 
-loadconfig()
-log.info("App config: "+os.path.join(sys.prefix,confsys['appconfigpath']))
+if len(sys.argv)==3 and sys.argv[1]=="-c":
+    loadconfig(sys.argv[2])
+else:
+    loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
+
+log.info("App config: "+confsys['appconfigpath'])
 log.info("Job directory: "+get_jobdirroot())
 log.info("Listening on port "+str(confsys['listeningport'])+", under url \""+routepath+"\"")
 

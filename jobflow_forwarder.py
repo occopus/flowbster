@@ -108,7 +108,7 @@ def forward_one_output():
         return False
 
 
-def loadconfig():
+def loadconfig(sysconfpath):
     global confsys, jobdirroot, log
     sysconfpath = os.path.join('/etc','jobflow-config-sys.yaml')
     confsys = readconfig(sysconfpath)
@@ -118,8 +118,11 @@ def loadconfig():
     log = logging.getLogger("jobflow.forwarder")
 
 
+if len(sys.argv)==3 and sys.argv[1]=="-c":
+    loadconfig(sys.argv[2])
+else:
+    loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
 
-loadconfig()
 while True:
     forward_one_output()
     time.sleep(confsys['sleepinterval'])
