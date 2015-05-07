@@ -27,6 +27,15 @@ write_files:
     - permissions: '0644'
       content: "content:jobflow_forwarder.py"
       path: /home/jobflow/jobflow_forwarder.py
+    
+    - permissions: '0644'
+      content: "content:jobflow-config-sys.yaml"
+      path: /etc/jobflow-config-sys.yaml
+
+    - permissions: '0644'
+      content: "content:jobflow-config-app.yaml"
+      path: /etc/jobflow-config-app.yaml
+
 
 
 
