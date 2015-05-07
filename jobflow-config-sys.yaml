@@ -11,7 +11,7 @@ logging:
     version: 1
     root:
         level: DEBUG
-        handlers: [console, file]
+        handlers: [file]
     formatters:
         simpleFormatter:
             format: "%(asctime)s\t%(name)s\t%(levelname)s\t%(message)s"
@@ -53,13 +53,13 @@ logging:
         jobflow.receiver:
             propagate: false
             level: DEBUG
-            handlers: [console, file-jobflow-receiver]
+            handlers: [file-jobflow-receiver]
         jobflow.executor:
             propagate: false
             level: DEBUG
-            handlers: [console, file-jobflow-executor]
+            handlers: [file-jobflow-executor]
         jobflow.forwarder:
             propagate: false
             level: DEBUG
-            handlers: [console, file-jobflow-forwarder]
+            handlers: [file-jobflow-forwarder]
 
