@@ -101,6 +101,7 @@ def loadconfig(sysconfpath):
     confsys = readconfig(sysconfpath)
     log = logging.config.dictConfig(confsys['logging'])
     log = logging.getLogger("jobflow.receiver")
+    create_dir(confsys['jobdirroot'])
     set_jobdirroot(confsys['jobdirroot'])
     confapp = readconfig(confsys['appconfigpath'])
 
