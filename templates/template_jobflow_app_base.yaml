@@ -1,0 +1,16 @@
+ 
+executable:
+    filename: {{APP_EXE_NAME}}
+    content: {{APP_EXE_CONTENT}}
+inputs: {% for item in APP_INPUTS %}
+    -
+        name: {{item.name}}
+{% endfor %}
+outputs: {% for item in APP_OUTPUTS %}
+    -
+        name: {{item.name}}
+        targetname: {{item.targetname}}
+        targeturl: {{item.targeturl}}
+{% endfor %}
+arguments: {{APP_ARGUMENTS}}
+
