@@ -1,13 +1,5 @@
 #cloud-config
 
-groups:
-    - users
-
-users:
-    - name: jobflow
-      gecos: Jobflow Application
-      groups: users
-
 packages:
     - python
     - python-pip
