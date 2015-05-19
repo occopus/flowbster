@@ -35,12 +35,7 @@ if args.scriptdir is not None:
     script_dir=args.scriptdir
 if args.outfile is not None:
     result_file=args.outfile
-"""
-print args
-print "base_template_name: ",base_template_name
-print "result_file: ",result_file
-print "script_dir: ",script_dir
-"""
+
 sec_base = load_base_template(base_template_name)
 sec_base = replace_contents_of_files(sec_base)
 
