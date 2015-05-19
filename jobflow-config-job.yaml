@@ -1,14 +1,10 @@
 
-wfid: unique-id-of-the-wf
+wfid: unique-id-of-the-wf12
 inputs:
     -
         name: one_file
-        content: |
-            lorem ipsum
-            dolor
+        url: http://mishra.lpds.sztaki.hu/edgidemo/download/jobflow/file1.txt
     -
         name: two_file
-        content: |
-            sit amet
-            luna
+        url: http://mishra.lpds.sztaki.hu/edgidemo/download/jobflow/file2.txt
 
