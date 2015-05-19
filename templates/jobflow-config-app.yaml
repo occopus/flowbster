@@ -1,17 +1,7 @@
  
 executable:
     filename: exe.bin
-    content: |
-        #!/bin/bash
-        infile1="$1"
-        infile2="$2"
-        outfile="$3"
-
-        cat "$infile1" "$infile2" > "$outfile"
-        echo "This is stdout."
-        echo "This is stderr." >&2
-
-        sleep 1
+    tgzURL: http://mishra.lpds.sztaki.hu/edgidemo/download/jobflow/jobflow-app1.tgz
 inputs:
     -
         name: one_file

@@ -1,16 +1,14 @@
- 
+
 executable:
     filename: {{APP_EXE_NAME}}
-    content: {{APP_EXE_CONTENT}}
+    tgzURL: {{APP_TGZ_URL}}
 inputs: {% for item in APP_INPUTS %}
     -
-        name: {{item.name}}
-{% endfor %}
+        name: {{item.name}} {% endfor %}
 outputs: {% for item in APP_OUTPUTS %}
     -
         name: {{item.name}}
         targetname: {{item.targetname}}
-        targeturl: {{item.targeturl}}
-{% endfor %}
+        targeturl: {{item.targeturl}} {% endfor %}
 arguments: {{APP_ARGUMENTS}}
 
