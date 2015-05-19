@@ -1,0 +1,10 @@
+
+wfid: unique-id-of-the-wf8
+inputs:
+    -
+        name: one_file
+        tgzURL: http://mishra.lpds.sztaki.hu/edgidemo/download/jobflow/f1.tgz
+    -
+        name: two_file
+        tgzURL: http://mishra.lpds.sztaki.hu/edgidemo/download/jobflow/f2.tgz
+

@@ -1,0 +1,30 @@
+ 
+executable:
+    filename: exe.bin
+    content: |
+        #!/bin/bash
+        infile1="$1"
+        infile2="$2"
+        outfile="$3"
+
+        cat "$infile1" "$infile2" > "$outfile"
+        echo "This is stdout."
+        echo "This is stderr." >&2
+
+        sleep 1
+inputs:
+    -
+        name: one_file
+    -
+        name: two_file
+outputs:
+    -
+        name: out_file
+        targetname: one_file
+        targeturl: http://192.168.153.107:5001/jobflow
+    -
+        name: out_file
+        targetname: two_file
+        targeturl: http://192.168.153.107:5001/jobflow
+arguments: one_file two_file out_file          
+

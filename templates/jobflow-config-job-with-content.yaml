@@ -1,0 +1,15 @@
+
+wfid: unique-id-of-the-wf7
+inputs:
+    -
+        name: one_file
+        content: |
+            lorem ipsum
+            dolor
+    -
+        name: two_file
+        tgzURL: 
+        content: |
+            sit amet
+            luna
+
