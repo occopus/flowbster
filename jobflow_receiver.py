@@ -6,6 +6,9 @@ from flask import Flask
 from flask import request
 import logging
 import logging.config
+import wget
+import tarfile
+import pwd
 
 def readconfig(pathtoconfig):
     with open(pathtoconfig, 'r') as f:
@@ -41,19 +44,51 @@ def save_a_file(directory,name,content):
     fo.close()
     return fullpath
 
+def download_a_file(url,targetdir):
+    log.debug("Downloading "+url+"...")
+    return wget.download(url,out=targetdir,bar=None)
+
+def unzip_a_file(tgzpath,targetdir):
+    tar = tarfile.open(tgzpath)
+    tar.extractall(path=targetdir)
+    tar.close()
+
 def create_input_files(confjob,confapp,directory):
     inputlist = confapp['inputs']
     for k in inputlist:
         filename = k['name']
         for d in confjob['inputs']:
             if d['name'] == filename:
-                save_a_file(directory,filename,d['content'])
+                if 'content' in d:
+                    save_a_file(directory,filename,d['content'])
+                elif 'tgzURL' in d:
+                    tgzpath = download_a_file(d['tgzURL'],directory)
+                    unzip_a_file(tgzpath,directory)
+                    untarred = os.path.join(directory,filename)
+                    os.chown(untarred,pwd.getpwnam('root').pw_uid,pwd.getpwnam('root').pw_gid)
+                elif 'url' in d:
+                    download_a_file(d['url'],os.path.join(directory,filename))
+                else:
+                    log.error("No content, nor url(s) are defined in job for file: "+filename+" !")
                 log.debug("- inputfile: "+filename)
 
 def create_executable(confapp,directory):
     filepath = save_a_file(directory,confapp['executable']['filename'],confapp['executable']['content'])
     st = os.stat(filepath)
     os.chmod(filepath, st.st_mode | stat.S_IEXEC)
+    log.debug("- executable: "+confapp['executable']['filename'])
+
+def download_executable(confapp,directory):
+    tgzpath = download_a_file(confapp['executable']['tgzURL'],directory)
+    log.debug("- executable downloaded: "+tgzpath)
+
+    unzip_a_file(tgzpath,directory)
+    log.debug("- executable extracted.")
+
+    filepath = os.path.join(directory,confapp['executable']['filename'])
+    st = os.stat(filepath)
+    os.chmod(filepath, st.st_mode | stat.S_IEXEC)
+    os.chown(filepath,pwd.getpwnam('root').pw_uid,pwd.getpwnam('root').pw_gid)
     log.debug("- executable: "+confapp['executable']['filename'])
 
 def get_jobid_by_wfid(confjob):
@@ -92,7 +127,13 @@ def deploy(jobid,confjob,confapp):
     fw.close()
     sandboxdir = get_sandboxdir(jobid)
     create_dir(sandboxdir)
-    create_executable(confapp,sandboxdir)
+    if 'content' in confapp['executable']:
+        create_executable(confapp,sandboxdir)
+    elif 'tgzURL' in confapp['executable']:
+        download_executable(confapp,sandboxdir)
+    else:
+        log.critical("Application is not defined. No content, no url found!")
+        sys.exit(1)
     create_input_files(confjob,confapp,sandboxdir)
     log.info("Job deployment finished.")
 
