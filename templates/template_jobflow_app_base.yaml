@@ -1,14 +1,15 @@
-
-executable:
-    filename: {{APP_EXE_NAME}}
-    tgzURL: {{APP_TGZ_URL}}
-inputs: {% for item in APP_INPUTS %}
-    -
-        name: {{item.name}} {% endfor %}
-outputs: {% for item in APP_OUTPUTS %}
-    -
-        name: {{item.name}}
-        targetname: {{item.targetname}}
-        targeturl: {{item.targeturl}} {% endfor %}
-arguments: {{APP_ARGUMENTS}}
-
+- permissions: '0644'
+  content: |
+        executable:
+            filename: {{APP_EXE_NAME}}
+            tgzURL: {{APP_EXE_TGZURL}}
+        inputs: {% for item in APP_INPUTS %}
+            -
+                name: {{item.name}} {% endfor %}
+        outputs: {% for item in APP_OUTPUTS %}
+            -
+                name: {{item.name}}
+                targetname: {{item.targetname}}
+                targeturl: {{item.targeturl}} {% endfor %}
+        arguments: {{APP_ARGUMENTS}}
+  path: /etc/jobflow-config-app.yaml

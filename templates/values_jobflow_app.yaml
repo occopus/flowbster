@@ -1,5 +1,5 @@
 APP_EXE_NAME: exe.bin
-APP_EXE_CONTENT: "#!/bin/bash\ninfile1=\"$1\"\ninfile2=\"$2\"\noutfile=\"$3\"\n\ncat \"$infile1\" \"$infile2\" > \"$outfile\"\necho \"This is stdout.\"\\n echo \"This is stderr.\" >&2\n\nsleep 1\n"
+APP_EXE_TGZURL: "http://mishra.lpds.sztaki.hu/edgidemo/download/jobflow/jobflow-app1.tgz"
 APP_INPUTS: [{"name":"one_file"},{"name":"two_file"}]
-APP_OUTPUTS: [{"name":"out_file","targetname":"one_file","targeturl":"http://192.168.153.107:5001/jobflow"},{"name":"out_file","targetname":"two_file","targeturl":"http://192.168.153.107:5001/jobflow"}]
+APP_OUTPUTS: [{"name":"out_file","targetname":"one_file","targeturl":"http://192.168.153.107:5001/jobflow"}]
 APP_ARGUMENTS: "one_file two_file out_file"

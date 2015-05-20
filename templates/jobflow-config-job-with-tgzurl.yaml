@@ -1,5 +1,5 @@
 
-wfid: unique-id-of-the-wf8
+wfid: unique-id-of-the-wf
 inputs:
     -
         name: one_file
