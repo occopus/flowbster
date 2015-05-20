@@ -1,7 +1,7 @@
 #!/bin/sh
 
 TARGET="jobflow_ci_config_with_app.yaml"
-TMPL="template_jobflow_ci_config.yaml"
+TMPL="template_jobflow_ci_config_base.yaml"
 VALUES="values_jobflow_app.yaml"
 
 echo $*

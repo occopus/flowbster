@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TARGET="template_jobflow_ci_config.yaml"
+TARGET="template_jobflow_ci_config_base.yaml"
 BASESYSTMPL="template_jobflow_sys_base.yaml"
 BASEAPPTMPL="template_jobflow_app_base.yaml"
 python create_jobflow_template_frames.py --base $BASESYSTMPL --scriptdir .. > $TARGET
