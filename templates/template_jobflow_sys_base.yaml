@@ -15,21 +15,21 @@ runcmd:
 
 write_files:
     - permissions: '0644'
-      content: "content:jobflow_receiver.py"
+      content: "contentS:jobflow_receiver.py"
       path: /home/jobflow/jobflow_receiver.py
     
     - permissions: '0644'
-      content: "content:jobflow_executor.py"
+      content: "contentS:jobflow_executor.py"
       path: /home/jobflow/jobflow_executor.py
 
     - permissions: '0644'
-      content: "content:jobflow_forwarder.py"
+      content: "contentS:jobflow_forwarder.py"
       path: /home/jobflow/jobflow_forwarder.py
     
     - permissions: '0744'
-      content: "content:jobflow-run.sh"
+      content: "contentS:jobflow-run.sh"
       path: /home/jobflow/jobflow-run.sh
 
     - permissions: '0644'
-      content: "content:jobflow-config-sys.yaml"
+      content: "contentT:jobflow-config-sys.yaml"
       path: /etc/jobflow-config-sys.yaml
