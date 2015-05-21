@@ -4,12 +4,12 @@ inputs:
     -
         name: one_file
         content: |
-            lorem ipsum
-            dolor
+            one: lorem ipsum
+            one: dolor
     -
         name: two_file
         tgzURL: 
         content: |
-            sit amet
-            luna
+            two: sit amet
+            two: luna
 
