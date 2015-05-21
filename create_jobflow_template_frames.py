@@ -6,7 +6,7 @@ content_script="contentS:"
 content_template="contentT:"
 script_dir=""
 template_dir=""
-base_template_name="template_jobflow_sys_base.yaml"
+base_template_name="template_jobflow_ci_config_frame_sys.yaml"
 result_file=""
 
 def load_base_template(path):
