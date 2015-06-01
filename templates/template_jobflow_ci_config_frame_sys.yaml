@@ -31,5 +31,5 @@ write_files:
       path: /home/jobflow/jobflow-run.sh
 
     - permissions: '0644'
-      content: "contentT:template_jobflow_ci_config_sys.yaml"
+      content: "contentT:jobflow_config_sys.yaml"
       path: /etc/jobflow-config-sys.yaml
