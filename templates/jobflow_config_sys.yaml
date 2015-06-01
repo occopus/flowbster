@@ -23,12 +23,6 @@ logging:
             formatter: simpleFormatter
             level: DEBUG
             stream: ext://sys.stdout
-        file:
-            class : logging.FileHandler
-            formatter: simpleFormatter
-            mode: w
-            level: DEBUG
-            filename: jobflow-root.log
         file-jobflow-receiver:
             class : logging.FileHandler
             formatter: simpleFormatter
