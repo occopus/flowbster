@@ -124,6 +124,6 @@ else:
     loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
 
 while True:
-    forward_one_output()
-    time.sleep(confsys['sleepinterval'])
+    if forward_one_output()==False :
+        time.sleep(confsys['sleepinterval'])
 
