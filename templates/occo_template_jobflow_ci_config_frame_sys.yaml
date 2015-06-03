@@ -12,6 +12,7 @@ runcmd:
     - pip install Flask
     - pip install wget
     - /home/jobflow/jobflow-run.sh
+    - echo "* * * * * root /home/jobflow/jobflow-run.sh" >> /etc/cron.d/jobflow
 
 write_files:
     - permissions: '0644'
