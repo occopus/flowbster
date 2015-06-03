@@ -79,16 +79,9 @@ else:
     loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
 
 while True:
-    if exec_one_job()==False :
-        time.sleep(confsys['sleepinterval'])
-
-
-
-
-
-
-
-
-
-
+    try:
+        if exec_one_job()==False :
+            time.sleep(confsys['sleepinterval'])
+    except BaseException:
+        log.exception("EXCEPTION:")
 
