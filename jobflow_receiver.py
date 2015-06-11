@@ -9,6 +9,8 @@ import logging.config
 import wget
 import tarfile
 import pwd
+import glob
+from ndimCollector import ndimCollector
 
 def readconfig(pathtoconfig):
     with open(pathtoconfig, 'r') as f:
@@ -21,11 +23,17 @@ def set_jobdirroot(path):
 def get_jobdirroot():
     return jobdirroot
 
-def get_jobdir(jobid):
-    return os.path.join(jobdirroot,jobid)
+def get_wfdir(wfid):
+    return os.path.join(jobdirroot,wfid)
 
-def get_sandboxdir(jobid):
-    jobdir = get_jobdir(jobid)
+def get_inputdir(wfid):
+    return os.path.join(get_wfdir(wfid),"inputs")
+
+def get_jobdir(wfid,jobid):
+    return os.path.join(jobdirroot,wfid,jobid)
+
+def get_sandboxdir(wfid,jobid):
+    jobdir = get_jobdir(wfid,jobid)
     return os.path.join(jobdir,'sandbox')
 
 def get_exe_name(config):
@@ -45,7 +53,7 @@ def save_a_file(directory,name,content):
     return fullpath
 
 def download_a_file(url,targetdir):
-    log.debug("Downloading "+url+"...")
+    log.debug("- downloading "+url+"...")
     return wget.download(url,out=targetdir,bar=None)
 
 def unzip_a_file(tgzpath,targetdir):
@@ -53,24 +61,30 @@ def unzip_a_file(tgzpath,targetdir):
     tar.extractall(path=targetdir)
     tar.close()
 
-def create_input_files(confjob,confapp,directory):
+def input_file_deploy(confinp,confapp,directory):
     inputlist = confapp['inputs']
     for k in inputlist:
         filename = k['name']
-        for d in confjob['inputs']:
-            if d['name'] == filename:
-                if 'content' in d:
-                    save_a_file(directory,filename,d['content'])
-                elif 'tgzURL' in d:
-                    tgzpath = download_a_file(d['tgzURL'],directory)
-                    unzip_a_file(tgzpath,directory)
-                    untarred = os.path.join(directory,filename)
-                    os.chown(untarred,pwd.getpwnam('root').pw_uid,pwd.getpwnam('root').pw_gid)
-                elif 'url' in d:
-                    download_a_file(d['url'],os.path.join(directory,filename))
-                else:
-                    log.error("No content, nor url(s) are defined in job for file: "+filename+" !")
-                log.debug("- inputfile: "+filename)
+        if confinp['name'] == filename:
+            filename=filename+"_"+str(confinp['index'])
+            if 'content' in confinp:
+                save_a_file(directory,filename,confinp['content'])
+            elif 'tgzURL' in confinp:
+                tgzpath = download_a_file(confinp['tgzURL'],directory)
+                unzip_a_file(tgzpath,directory)
+                untarred = os.path.join(directory,filename)
+                os.chown(untarred,pwd.getpwnam('root').pw_uid,pwd.getpwnam('root').pw_gid)
+            elif 'url' in confinp:
+                download_a_file(confinp['url'],os.path.join(directory,filename))
+            else:
+                log.error("No content, nor url(s) are defined in job for file: "+filename+" !")
+            log.debug("- inputfile: "+filename)
+
+def input_files_link(inputdir,input_filenames,sandboxdir,input_names):
+    for index, ifile in enumerate(input_filenames):
+        os.symlink(os.path.join(inputdir,ifile),os.path.join(sandboxdir,input_names[index]))
+
+    return
 
 def create_executable(confapp,directory):
     filepath = save_a_file(directory,confapp['executable']['filename'],confapp['executable']['content'])
@@ -88,45 +102,30 @@ def download_executable(confapp,directory):
     filepath = os.path.join(directory,confapp['executable']['filename'])
     st = os.stat(filepath)
     os.chmod(filepath, st.st_mode | stat.S_IEXEC)
-    os.chown(filepath,pwd.getpwnam('root').pw_uid,pwd.getpwnam('root').pw_gid)
+    os.chown(filepath,pwd.getpwnam('occo').pw_uid,pwd.getpwnam('occo').pw_gid)
     log.debug("- executable: "+confapp['executable']['filename'])
 
-def get_jobid_by_wfid(confjob):
-    jobid = str(uuid.uuid1())
-    wfidstr=confjob['wfid']
-    jobdirroot=get_jobdirroot()
-    dirs = os.listdir(jobdirroot)
-    for name in dirs:
-       wfidfile = os.path.join(jobdirroot,name,'wfid='+wfidstr)
-       if os.path.exists(wfidfile):
-           return name
-    return jobid
+def pass_to_executor(wfiddir,jobdir):
+    newjobdir = "E_"+jobdir[2:]
+    os.rename(os.path.join(wfiddir,jobdir),os.path.join(wfiddir,newjobdir))
+    log.debug("- passed for exec: "+newjobdir)
+    return
 
-def deploy(jobid,confjob,confapp):
-    jobdir = get_jobdir(jobid)
+def deploy(wfid,input_filenames,jobdir_name,input_names,confapp):
+    log.info("Job deployment starts.")
+    log.debug("- jobid: "+jobdir_name)
+    log.debug("- wfid: "+wfid)
+
+    wfiddir = get_wfdir(wfid)
+
+    jobdir = os.path.join(wfiddir,jobdir_name)
     create_dir(jobdir)
-    wfidstr = confjob['wfid']
-    log.debug("- wfid: "+wfidstr)
-    fw = open(os.path.join(jobdir,"wfid="+wfidstr), "wb")
-    fw.write(wfidstr);
-    fw.close()
-  
-    confjobname="config-job.yaml"
-    if os.path.exists(os.path.join(jobdir,confjobname)):
-        ind=1
-        while os.path.exists(os.path.join(jobdir,confjobname+"."+str(ind))):
-            ind=ind+1
-        confjobname=confjobname+"."+str(ind)
-    fw = open(os.path.join(jobdir,confjobname), "wb")
-    fw.write(yaml.dump(confjob));
-    fw.close()
-    log.debug("- jobconfig file: "+confjobname)
+
+    log.debug("- jobinput files: "+str(input_filenames))
     
-    fw = open(os.path.join(jobdir,"config-app.yaml"), "wb")
-    fw.write(yaml.dump(confapp));
-    fw.close()
-    sandboxdir = get_sandboxdir(jobid)
+    sandboxdir = os.path.join(jobdir,"sandbox")
     create_dir(sandboxdir)
+
     if 'content' in confapp['executable']:
         create_executable(confapp,sandboxdir)
     elif 'tgzURL' in confapp['executable']:
@@ -134,30 +133,69 @@ def deploy(jobid,confjob,confapp):
     else:
         log.critical("Application is not defined. No content, no url found!")
         sys.exit(1)
-    create_input_files(confjob,confapp,sandboxdir)
+
+    input_files_link(get_inputdir(wfid),input_filenames,sandboxdir,input_names)
+
+    pass_to_executor(wfiddir,jobdir_name)
+
     log.info("Job deployment finished.")
 
+def deploy_jobs(wfid,confapp):
+    input_names = nDimColl.getDimNames()
+    input_indexes = nDimColl.getHitListHead()
+    while (input_indexes):
+        ifnames_ind = []
+        jobdir_name = "R_job"
+        for index,item in enumerate(input_names):
+            ifnames_ind.append(item+"_"+str(input_indexes[index]))
+            jobdir_name+="_"+str(input_indexes[index])
+        deploy(wfid,ifnames_ind,jobdir_name,input_names,confapp)
+        nDimColl.removeHitListHead()
+        input_indexes = nDimColl.getHitListHead()
+    return
+
 def loadconfig(sysconfpath):
-    global confsys, app, confapp, routepath, log
+    global confsys, app, confapp, routepath, log, nDimColl
     confsys = readconfig(sysconfpath)
     log = logging.config.dictConfig(confsys['logging'])
     log = logging.getLogger("jobflow.receiver")
     create_dir(confsys['jobdirroot'])
     set_jobdirroot(confsys['jobdirroot'])
     confapp = readconfig(confsys['appconfigpath'])
+    nDimColl = ndimCollector(len(confapp['inputs']))
+
+def input_set_default(input_item):
+    if 'index' not in input_item.keys():
+        input_item['index']=0
+        input_item['count']=1
+
+def input_register(input_item):
+    if not nDimColl.checkDimExists(input_item['name']):
+        nDimColl.addDim(input_item['name'],input_item['count'],nDimColl.getNumOfDim())
+    nDimColl.addItem(input_item['name'],input_item['index'])
+    return
 
 routepath = "/jobflow"
 app = Flask(__name__)
  
 @app.route(routepath,methods=['POST'])
 def receive():
-    log.info("New job arrived.")
+    log.info("New input(s) arrived.")
     rdata = request.get_data()
     confjob = yaml.load(rdata)
-    jobid = get_jobid_by_wfid(confjob)
-    log.info("Assigned jobid is \""+jobid+"\"")
-    deploy(jobid,confjob,confapp)
-    return jobid
+    wfid = confjob['wfid']
+    wfdir = get_wfdir(wfid)
+    create_dir(wfdir)
+    inputdir = get_inputdir(wfid)
+    create_dir(inputdir)
+    nDimColl.deserialise(os.path.join(wfdir,"nDimColl.yaml"))
+    for input_item in confjob['inputs']:
+        input_set_default(input_item)
+        input_file_deploy(input_item,confapp,inputdir)
+        input_register(input_item)
+    deploy_jobs(wfid,confapp)
+    nDimColl.serialise(os.path.join(wfdir,"nDimColl.yaml"))
+    return wfid
 
 if len(sys.argv)==3 and sys.argv[1]=="-c":
     loadconfig(sys.argv[2])

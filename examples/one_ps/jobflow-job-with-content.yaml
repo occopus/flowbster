@@ -1,0 +1,47 @@
+
+wfid: unique-id-of-the-wf
+inputs:
+    -
+        name: one_file
+        index: 0
+        count: 3
+        content: |
+            one: lorem ipsum
+            one: dolor
+    -
+        name: two_file
+        index: 1
+        count: 3
+        content: |
+            two: sit amet
+            two: luna
+    -
+        name: two_file
+        index: 0 
+        count: 3
+        content: |
+            two: sit amet
+            two: luna
+    -
+        name: one_file
+        index: 1 
+        count: 3
+        content: |
+            one: lorem ipsum
+            one: dolor
+    -
+        name: one_file
+        index: 2
+        count: 3
+        content: |
+            one: lorem ipsum
+            one: dolor
+    -
+        name: two_file
+        index: 2 
+        count: 3
+        content: |
+            two: sit amet
+            two: luna
+
+
