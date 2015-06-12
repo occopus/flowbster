@@ -165,6 +165,7 @@ def deploy_jobs(wfid,confapp):
     input_descr = {}
     input_descr['names']=input_names
     input_descr['lengths']=input_lengths
+    input_descr['jobcount']=nDimColl.getMaxSize()
     while (input_indexes):
         input_descr['indexes']=input_indexes
         input_descr['files']=gen_input_filenames(input_descr)

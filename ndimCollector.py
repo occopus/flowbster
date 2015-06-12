@@ -8,6 +8,7 @@ class ndimCollector:
         self.s['maxdim'] = maxdim
         self.s['numOfDims'] = 0
         self.s['lengthOfDims'] = [0] * self.s['maxdim']
+        self.s['maxsize'] = 0
         self.s['normDimInd'] = [-1] * self.s['maxdim']
         self.s['nameOfDims'] = [""] * self.s['maxdim']
         self.s['listOfLists'] = [0]
@@ -87,8 +88,10 @@ class ndimCollector:
             self.s['lengthOfDims'][self.s['numOfDims']-1]=length
             if self.s['numOfDims'] == 1:
                 self.s['listOfLists'] = [0] * length
+                self.s['maxsize'] = length
             else:
                 self.expandListByOneDim(self.s['listOfLists'],self.s['numOfDims'],length)
+                self.s['maxsize'] = self.s['maxsize'] * length
 
     def getNumOfDim(self):
         return self.s['numOfDims']
@@ -98,6 +101,9 @@ class ndimCollector:
 
     def getDimLengths(self):
         return self.s['lengthOfDims']
+
+    def getMaxSize(self):
+        return self.s['maxsize']
 
     def getHitList(self):
         return self.s['hitList']
@@ -121,6 +127,7 @@ class ndimCollector:
     def reset(self):
         self.s['numOfDims'] = 0
         self.s['lengthOfDims'] = [0] * self.s['maxdim']
+        self.s['maxsize'] = 0
         self.s['normDimInd'] = [-1] * self.s['maxdim']
         self.s['nameOfDims'] = [""] * self.s['maxdim']
         self.s['listOfLists'] = [0]
