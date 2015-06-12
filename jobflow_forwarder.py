@@ -4,6 +4,7 @@ import os,sys,stat
 import logging
 import logging.config
 import time
+import glob
 
 def readconfig(pathtoconfig):
     with open(pathtoconfig, 'r') as f:
@@ -25,22 +26,9 @@ def perform_sending_content(url,content):
     return True
 
 def find_output_to_forward(jobdirroot):
-    dirs = os.listdir(jobdirroot)
-
-    found = False
-    for name in dirs:
-        confapppath = os.path.join(jobdirroot,name,'config-app.yaml')
-        if not os.path.exists(confapppath):
-            continue
-        jobdir = os.path.join(jobdirroot,name)
-        if not os.path.exists(os.path.join(jobdir,'retcode')):
-            continue
-        if os.path.exists(os.path.join(jobdir,'output-forwarded')):
-            continue
-        found = True
-        break
-    if found:
-        return jobdir
+    dirs = glob.glob(os.path.join(jobdirroot,"*/F_*"))
+    if dirs:
+        return dirs[0]
     else:
         return False
 
@@ -100,9 +88,9 @@ def forward_one_output():
     jobdir = find_output_to_forward(jobdirroot)
     if jobdir:
         log.info("Found output to forward at \""+jobdir+"\"")
-        forward_outputs(jobdir)
+        #forward_outputs(jobdir)
         log.info("Forward finished.")
-        return jobdir
+        return False
     else:
         log.info("No output found to be forwarded.")
         return False
@@ -110,7 +98,6 @@ def forward_one_output():
 
 def loadconfig(sysconfpath):
     global confsys, jobdirroot, log
-    sysconfpath = os.path.join('/etc','jobflow-config-sys.yaml')
     confsys = readconfig(sysconfpath)
     jobdirroot = os.path.join(confsys['jobdirroot'])
     if not os.path.exists(jobdirroot): os.makedirs(jobdirroot)
