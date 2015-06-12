@@ -96,6 +96,9 @@ class ndimCollector:
     def getDimNames(self):
         return self.s['nameOfDims']
 
+    def getDimLengths(self):
+        return self.s['lengthOfDims']
+
     def getHitList(self):
         return self.s['hitList']
 

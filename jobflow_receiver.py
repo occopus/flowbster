@@ -111,17 +111,33 @@ def pass_to_executor(wfiddir,jobdir):
     log.debug("- passed for exec: "+newjobdir)
     return
 
-def deploy(wfid,input_filenames,jobdir_name,input_names,confapp):
+def deploy_input_descr(jobdir,descr):
+    save_a_file(jobdir,"input_descr.yaml",yaml.dump(descr))
+    return
+
+def gen_input_filenames(input_descr):
+    ifnames = []
+    for index,item in enumerate(input_descr['names']):
+        ifnames.append(item+"_"+str(input_descr['indexes'][index]))
+    return ifnames
+
+def gen_jobdir(input_descr):
+    jobdir_name = "R_job"
+    for index,item in enumerate(input_descr['names']):
+        jobdir_name+="_"+str(input_descr['indexes'][index])
+    return jobdir_name
+
+def deploy(wfid,input_descr,confapp):
     log.info("Job deployment starts.")
-    log.debug("- jobid: "+jobdir_name)
-    log.debug("- wfid: "+wfid)
 
     wfiddir = get_wfdir(wfid)
+    log.debug("- jobid: "+input_descr['jobdir'])
+    log.debug("- wfid: "+wfid)
 
-    jobdir = os.path.join(wfiddir,jobdir_name)
+    jobdir = os.path.join(wfiddir,input_descr['jobdir'])
     create_dir(jobdir)
 
-    log.debug("- jobinput files: "+str(input_filenames))
+    log.debug("- jobinput files: "+str(input_descr['files']))
     
     sandboxdir = os.path.join(jobdir,"sandbox")
     create_dir(sandboxdir)
@@ -134,22 +150,26 @@ def deploy(wfid,input_filenames,jobdir_name,input_names,confapp):
         log.critical("Application is not defined. No content, no url found!")
         sys.exit(1)
 
-    input_files_link(get_inputdir(wfid),input_filenames,sandboxdir,input_names)
+    input_files_link(get_inputdir(wfid),input_descr['files'],sandboxdir,input_descr['names'])
 
-    pass_to_executor(wfiddir,jobdir_name)
+    deploy_input_descr(jobdir,input_descr)
 
+    pass_to_executor(wfiddir,input_descr['jobdir'])
+    
     log.info("Job deployment finished.")
 
 def deploy_jobs(wfid,confapp):
     input_names = nDimColl.getDimNames()
+    input_lengths = nDimColl.getDimLengths()
     input_indexes = nDimColl.getHitListHead()
+    input_descr = {}
+    input_descr['names']=input_names
+    input_descr['lengths']=input_lengths
     while (input_indexes):
-        ifnames_ind = []
-        jobdir_name = "R_job"
-        for index,item in enumerate(input_names):
-            ifnames_ind.append(item+"_"+str(input_indexes[index]))
-            jobdir_name+="_"+str(input_indexes[index])
-        deploy(wfid,ifnames_ind,jobdir_name,input_names,confapp)
+        input_descr['indexes']=input_indexes
+        input_descr['files']=gen_input_filenames(input_descr)
+        input_descr['jobdir']=gen_jobdir(input_descr)
+        deploy(wfid,input_descr,confapp)
         nDimColl.removeHitListHead()
         input_indexes = nDimColl.getHitListHead()
     return
