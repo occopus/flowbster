@@ -30,7 +30,7 @@ if path:
         print "Error when reading file: %s" % e
         sys.exit(1)
         
-    content = add_time_stamp_to_wfid(content)
+    #content = add_time_stamp_to_wfid(content)
 
     try:
         requests.post(url, data=yaml.dump(content))
