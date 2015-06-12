@@ -6,10 +6,11 @@
 # as in the --default example).
 
 JOBFILE="jobflow-job-with-content.yaml"
+HOSTIP="192.168.153.153"
 NUM=1
 
 if [[ $# < 2 ]]; then
-        echo "Usage: $0 -h [hostip] -d [datafile] default: \"-d $JOBFILE\""
+        echo "Usage: $0 -h [hostip] -j [jobfile] default: \"-h $HOSTIP -j $JOBFILE -n $NUM\""
 fi
 
 while [[ $# > 0 ]]
@@ -25,7 +26,7 @@ case $key in
     HOSTIP="$2"
     shift # past argument
     ;;
-    -d|--datafile)
+    -j|--jobfile)
     JOBFILE="$2"
     shift # past argument
     ;;
