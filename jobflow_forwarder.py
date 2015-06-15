@@ -32,7 +32,31 @@ def find_output_to_forward(jobdirroot):
     else:
         return False
 
+def mark_job_as_forwarded(jobdir):
+    wfdir = os.path.dirname(jobdir)
+    jobdirname = os.path.basename(jobdir)
+    newjobdir = "D_"+jobdirname[2:]
+    os.rename(jobdir,os.path.join(wfdir,newjobdir))
+    return newjobdir
+
 def forward_outputs(jobdir):
+    input_descr = readconfig(os.path.join(jobdir,"input_descr.yaml"))
+    log.debug("Input descr: "+str(input_descr))
+    log.debug("App descr: "+str(confapp))
+
+    outputs = confapp["outputs"]
+    log.debug("Outputs: "+str(outputs))
+    
+
+	
+
+
+
+
+
+    mark_job_as_forwarded(jobdir)
+    return
+
     job_config = readconfig(os.path.join(jobdir,"config-job.yaml"))
     if not job_config.has_key("wfid"):
         log.error("Key \'wfid\' not found in config-job.yaml")
@@ -43,7 +67,6 @@ def forward_outputs(jobdir):
     if not app_config.has_key("outputs"):
         log.error("Key \'outputs\' not found in config-app.yaml")
         return False
-    outputs = app_config.get("outputs")
 
     forward_success = True
     for ind, out in enumerate(outputs):
@@ -88,7 +111,7 @@ def forward_one_output():
     jobdir = find_output_to_forward(jobdirroot)
     if jobdir:
         log.info("Found output to forward at \""+jobdir+"\"")
-        #forward_outputs(jobdir)
+        forward_outputs(jobdir)
         log.info("Forward finished.")
         return False
     else:
@@ -97,12 +120,13 @@ def forward_one_output():
 
 
 def loadconfig(sysconfpath):
-    global confsys, jobdirroot, log
+    global confsys, jobdirroot, log, confapp
     confsys = readconfig(sysconfpath)
     jobdirroot = os.path.join(confsys['jobdirroot'])
     if not os.path.exists(jobdirroot): os.makedirs(jobdirroot)
     logging.config.dictConfig(confsys['logging'])
     log = logging.getLogger("jobflow.forwarder")
+    confapp = readconfig(confsys['appconfigpath'])
 
 
 if len(sys.argv)==3 and sys.argv[1]=="-c":
