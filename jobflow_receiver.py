@@ -11,6 +11,7 @@ import tarfile
 import pwd
 import glob
 from ndimCollector import ndimCollector
+import getpass
 
 def readconfig(pathtoconfig):
     with open(pathtoconfig, 'r') as f:
@@ -102,7 +103,8 @@ def download_executable(confapp,directory):
     filepath = os.path.join(directory,confapp['executable']['filename'])
     st = os.stat(filepath)
     os.chmod(filepath, st.st_mode | stat.S_IEXEC)
-    os.chown(filepath,pwd.getpwnam('occo').pw_uid,pwd.getpwnam('occo').pw_gid)
+    username = getpass.getuser()
+    os.chown(filepath,pwd.getpwnam(username).pw_uid,pwd.getpwnam(username).pw_gid)
     log.debug("- executable: "+confapp['executable']['filename'])
 
 def pass_to_executor(wfiddir,jobdir):
