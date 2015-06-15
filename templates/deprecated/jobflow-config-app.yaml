@@ -11,10 +11,10 @@ outputs:
     -
         name: out_file
         targetname: one_file
-        targeturl: http://192.168.153.107:5001/jobflow
+        targeturl: http://192.168.153.153:5001/jobflow
     -
         name: out_file
         targetname: two_file
-        targeturl: http://192.168.153.107:5001/jobflow
+        targeturl: http://192.168.153.153:5001/jobflow
 arguments: one_file two_file out_file          
 
