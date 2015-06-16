@@ -43,57 +43,67 @@ def forward_outputs(jobdir):
     inputs = readconfig(os.path.join(jobdir,"inputs.yaml"))
     outputs = confapp["outputs"]
     
-    forward_success = True
+    forward_finished = True
     for ind, out in enumerate(outputs):
         
         genfilename = "genfiles-"+out["name"]+".yaml"
-        log.debug("Checking generated files for \""+out["name"]+"\"")
         if os.path.exists(os.path.join(jobdir,genfilename)):
-            log.debug("Skipping creating sum of generated files for \""+out["name"]+"\"")
+            log.debug("Loading list of generated files for \""+out["name"]+"\"")
             genfiles = readconfig(os.path.join(jobdir,genfilename))
         else:
+            log.debug("Creating list of generated files for \""+out["name"]+"\"")
             fullpath = os.path.join(jobdir,"sandbox",out["name"])
             generated_files = glob.glob(fullpath)
-            genfiles={}
+            genfiles = {}
             genfiles['count'] = len(generated_files)
-            genfiles['files'] = [ {"ind":ind,"name":os.path.basename(x)} for ind,x in enumerate(generated_files) ]
+            genfiles['files'] = [ {"index":ind,"name":os.path.basename(x)} for ind,x in enumerate(generated_files) ]
             save_a_file(jobdir,genfilename,yaml.dump(genfiles,default_flow_style=False))
+        log.debug("Num of generated files for \""+out["name"]+"\" is "+str(genfiles['count']))
 
-        
-        for genfiles_ind, one_genfile in enumerate(genfiles):
+        target_forward_count_filename = os.path.join(jobdir,'target-forward-count-'+str(ind))
+        if os.path.exists(target_forward_count_filename):
+            target_forward = readconfig(target_forward_count_filename)
+        else:
+            target_forward = {}
+            target_forward['count'] = 0
+            save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
+        log.debug("Target forward count for link "+str(ind)+" is "+str(target_forward['count']))
+
+        for one_genfile in genfiles['files']:
+            log.debug("Preparing sending "+str(one_genfile)+" to link "+str(ind))
             """log.debug("Checking output: \""+out["name"]+"\"")
             if os.path.exists(os.path.join(jobdir,'output-forwarded-'+str(ind))):
                 log.debug("Output \""+out["name"]+"\" has already been forwarded as \""+out["targetname"]+"\"")
                 continue
         """
-            if genfiles_ind < genfiles['done']
+            if one_genfile['index'] < target_forward['count']:
                 continue
        
-            job_dict = {}   
-            job_dict['wfid'] = inputs['wfid']
-            job_dict['inputs'] = []
+            content = {}   
+            content['wfid'] = str(inputs['wfid'])
+            content['inputs'] = []
             one_input = {}
             one_input['name'] = out["targetname"]
-            one_input['index'] = genfiles_ind
+            one_input['index'] = one_genfile['index']
             one_input['count'] = genfiles['count']
-            with open(os.path.join(jobdir,"sandbox",one_genfile), 'r') as fo:
+            with open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'r') as fo:
                 one_input['content'] = fo.read()
-            job_dict['inputs'].append(one_input)
-            content = yaml.dump(job_dict,default_flow_style=False)
+            content['inputs'].append(one_input)
             url = out["targeturl"]
           
             log.info("Sending content for \""+out.get("targetname")+"\" to \""+url+"\"")
+            log.debug("Content is: \n"+str(content))
             success = perform_sending_content(url,content)
             if success:
-                genfiles['done']+=1
-                save_a_file(jobdir,'output-forwarded-'+str(ind),'done')
+                target_forward['count']+=1
+                save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
                 log.info("Sending: SUCCESS.")
             else:
                 log.info("Sending: FAILED. Will retry later.")
-                forward_success = False
+                forward_finished = False
                 break
-    if forward_success:
-        save_a_file(jobdir,'output-forwarded','done')
+    if forward_finished:
+        mark_job_as_forwarded(jobdir)
         
     return True
 
