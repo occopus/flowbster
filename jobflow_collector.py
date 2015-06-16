@@ -28,7 +28,7 @@ def save_a_file(directory,name,content):
 
 def create_input_files(confjob,directory):
     for d in confjob['inputs']:
-        filename = d['name']
+        filename = d['name']+"_"+str(d['index'])
         log.debug("- file to save: \""+filename+"\"")
         if os.path.exists(os.path.join(directory,filename)):
             log.warning("- file \""+filename+"\" already exists! Renaming...")
