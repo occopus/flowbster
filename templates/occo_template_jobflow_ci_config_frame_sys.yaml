@@ -20,6 +20,10 @@ write_files:
       path: /home/jobflow/jobflow_receiver.py
     
     - permissions: '0644'
+      content: "contentS:ndimCollector.py"
+      path: /home/jobflow/ndimCollector.py
+    
+    - permissions: '0644'
       content: "contentS:jobflow_executor.py"
       path: /home/jobflow/jobflow_executor.py
 
