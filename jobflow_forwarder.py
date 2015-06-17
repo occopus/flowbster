@@ -71,11 +71,7 @@ def forward_outputs(jobdir):
 
         for one_genfile in genfiles['files']:
             log.debug("Preparing sending "+str(one_genfile)+" to link "+str(ind))
-            """log.debug("Checking output: \""+out["name"]+"\"")
-            if os.path.exists(os.path.join(jobdir,'output-forwarded-'+str(ind))):
-                log.debug("Output \""+out["name"]+"\" has already been forwarded as \""+out["targetname"]+"\"")
-                continue
-        """
+            
             if one_genfile['index'] < target_forward['count']:
                 continue
        
