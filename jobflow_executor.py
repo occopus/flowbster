@@ -21,8 +21,8 @@ def save_a_file(directory,name,content):
 
 def perform_exec(sandboxdir,exename,arguments):
     os.chdir(sandboxdir)
-    log.info(" - run: \""+exename+' '+arguments+'>../stdout 2>../stderr')
-    status = subprocess.call('./'+exename+' '+arguments+'>../stdout 2>../stderr',shell=True)
+    log.info(" - run: \""+exename+' '+arguments+' >../stdout 2>../stderr')
+    status = subprocess.call('./'+exename+' '+arguments+' >../stdout 2>../stderr',shell=True)
     save_a_file('..','retcode',str(status))
 
 def find_job_to_run(jobdirroot):
