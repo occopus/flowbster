@@ -122,14 +122,22 @@ def deploy_input_descr(jobdir,descr):
     save_a_file(jobdir,"inputs.yaml",yaml.dump(descr))
     return
 
+def get_naming_format(input):
+    for i in confapp['inputs']:
+        if i['name']==input and "format" in i:
+            return i['format']
+    return
 def gen_input_filenames(input_descr):
     #print input_descr
     ifnames = []
     for index,item in enumerate(input_descr['names']):
         if type(input_descr['indexes']['inp_file_indxs'][index]) is list:
+            format=get_naming_format(item)
+            if not format:
+                format = item+"_%i"
             newlist=[]
             for collitem in input_descr['indexes']['inp_file_indxs'][index]:
-                newlist.append(item+"_"+str(collitem))
+                newlist.append(str(format % collitem))
             ifnames.append(newlist)
         else:
             collitem = input_descr['indexes']['inp_file_indxs'][index]    
@@ -140,7 +148,10 @@ def gen_input_filenames(input_descr):
 def gen_jobdir(input_descr):
     jobdir_name = "R_job"
     for index,item in enumerate(input_descr['names']):
-        jobdir_name+="_"+str(input_descr['indexes']['inp_file_indxs'][index])
+        if type(input_descr['indexes']['inp_file_indxs'][index]) is list:
+            jobdir_name+="_"+str(input_descr['indexes']['inp_file_indxs'][index][0])
+        else:
+            jobdir_name+="_"+str(input_descr['indexes']['inp_file_indxs'][index])
     return jobdir_name
 
 def deploy(wfid,input_descr,confapp):
