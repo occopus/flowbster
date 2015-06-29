@@ -85,7 +85,7 @@ class ndimTester:
                 isColl = self.s['inputportiscoll'][nindex][pindex]
                 trg = self.s['nodelist'][nindex]
                 if type(inpmatrix) is list:
-                    print "Simulating node \"",nodename,"\" at port \"",portname,"\""
+                    #print "Simulating node \"",nodename,"\" at port \"",portname,"\""
                     maxitems = self.calcmax(inpmatrix)
                     trg.addDim(portname,maxitems,pindex,isColl,inpmatrix)
                     trg.addAllItemsToAPort(portname,self.s['maxinpmatrix'][nindex][pindex])
@@ -93,37 +93,33 @@ class ndimTester:
                 else:
                     srcnodeid = self.s['links'][nindex][pindex]
                     if srcnodeid>=0 and self.is_all_port_simulated(srcnodeid):
-                        print "Simulating node \"",nodename,"\" at port \"",portname,"\" from source \"",self.s['nodename'][srcnodeid],"\""
+                        #print "Simulating node \"",nodename,"\" at port \"",portname,"\" from source \"",self.s['nodename'][srcnodeid],"\""
                         src = self.s['nodelist'][srcnodeid]
                         hl = src.getHitList()
                         psgen = self.s['outputportgen'][srcnodeid][0]
                         if psgen == 1:
-                            print "No PS node."
                             maxitems = len(hl)
-                            trg.addDim(portname,len(hl),pindex,isColl,hl[0]['outputmax'])
+                            trg.addDim(portname,len(hl),pindex,isColl,hl[0]['om'])
                             for hlindex,hlitem in enumerate(hl):
-                                trg.addItem(portname,hlindex,hlitem['outputind'])
+                                trg.addItem(portname,hlindex,hlitem['oi'])
                             self.s['simulated'][nindex][pindex] = True
                         else:
-                            print "PS node."
                             maxitems = len(hl) * psgen
-                            maxindexes = hl[0]['outputmax'][:]
+                            maxindexes = hl[0]['om'][:]
                             maxindexes.append(psgen)
                             hlindex = 0
                             trg.addDim(portname,maxitems,pindex,isColl,maxindexes)
                             L=[0] * maxitems
                             for hlitem in hl:
-                                maxindexes = hlitem['outputmax'][:]
+                                maxindexes = hlitem['om'][:]
                                 maxindexes.append(psgen)
                                 for i in range(psgen):
-                                    indexes = hlitem['outputind'][:]
+                                    indexes = hlitem['oi'][:]
                                     indexeslen = len(indexes)
                                     indexes.append(i)
                                     L[hlindex]=indexes
-                                    print "PSOUT c:",hlindex,"item: ",indexes
                                     trg.addItem(portname,hlindex,indexes)
                                     hlindex+=1
-                            print "PSout:",L
                             self.s['simulated'][nindex][pindex] = True
         return
 
@@ -136,8 +132,8 @@ class ndimTester:
                 hl = node.getHitList()
                 numofrun = len(hl)
                 print "-> run: ",numofrun
-                print "-> out: ",numofrun*self.s['outputportgen'][index][0]
-                print "-> hitlist: "
+                print "-> res: ",numofrun*self.s['outputportgen'][index][0]
+                print "-> runlist: "
                 pprint.pprint(hl)
                 
 
