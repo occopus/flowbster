@@ -4,42 +4,55 @@ inputs:
     -
         name: one_file
         index: 0
-        count: 3
+        count: 4
+        index_list: [0,0]
+        count_list: [2,2]
         content: |
             one: lorem ipsum
             one: dolor
     -
-        name: two_file
-        index: 1
-        count: 3
-        content: |
-            two: sit amet
-            two: luna
-    -
-        name: two_file
-        index: 0 
-        count: 3
-        content: |
-            two: sit amet
-            two: luna
-    -
         name: one_file
         index: 1 
-        count: 3
+        count: 4
+        index_list: [0,1]
+        count_list: [2,2]
         content: |
             one: lorem ipsum
             one: dolor
     -
         name: one_file
         index: 2
-        count: 3
+        count: 4
+        index_list: [1,0]
+        count_list: [2,2]
+        content: |
+            one: lorem ipsum
+            one: dolor
+    -
+        name: one_file
+        index: 3
+        count: 4
+        index_list: [1,1]
+        count_list: [2,2]
         content: |
             one: lorem ipsum
             one: dolor
     -
         name: two_file
-        index: 2 
-        count: 3
+        content: |
+            two: sit amet
+            two: luna
+    -
+        name: three_file
+        index: 0
+        count: 2
+        content: |
+            two: sit amet
+            two: luna
+    -
+        name: three_file
+        index: 1
+        count: 2
         content: |
             two: sit amet
             two: luna
