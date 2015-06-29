@@ -68,10 +68,12 @@ class ndimCollector:
                 if inputIndexList not in self.s['hitListAll']:
                     self.s['hitListAll'].append(inputIndexList)
                     hititem={}
-                    hititem['input']=inputIndexList
+                    hititem['inp_file_indxs']=inputIndexList
+                    hititem['out_file_indxs_detailed']=outputIndexList
+                    hititem['out_file_maxs_detailed']=outputMaxList
                     L = self.mergeMultiPathIndexes(outputIndexList,outputMaxList)
-                    hititem['outputind']=L[0]
-                    hititem['outputmax']=L[1]
+                    hititem['out_file_indxs']=L[0]
+                    hititem['out_file_maxs']=L[1]
                     self.s['hitList'].append(hititem)
         return
 
@@ -272,8 +274,17 @@ class ndimCollector:
                     indexlist[indexforindexlist-1]+=1
         return
     
-    def mergeMultiPathIndexes(self,indlist,maxlist):
-        #print "INDLIST:",indlist,"MAXLIST:",maxlist
+    def mergeMultiPathIndexes(self,indList,maxList):
+        #print "INDLIST:",indList,"MAXLIST:",maxList
+        maxlist = []
+        indlist = []
+        for portIndex,port in enumerate(maxList):
+            maxlist.append([])
+            indlist.append([])
+            for psIndex,ps in enumerate(maxList[portIndex]):
+                if maxList[portIndex][psIndex] > 1:
+                    maxlist[portIndex].append(maxList[portIndex][psIndex])
+                    indlist[portIndex].append(indList[portIndex][psIndex])
         dimmax = 1
         for item in maxlist:
             if dimmax < len(item):
