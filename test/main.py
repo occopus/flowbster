@@ -6,15 +6,13 @@ import time
 infra = ndimTester(3)
 
 """JOB1"""
-infra.create_node("JOB1",2)
+infra.create_node("JOB1",1)
 infra.create_inputport("JOB1","G1",False)
-infra.create_inputport("JOB1","G2",False)
-infra.create_outputport("JOB1","O1",4)
-
+infra.create_outputport("JOB1","O1",5)
 
 """JOB2"""
 infra.create_node("JOB2",1)
-infra.create_inputport("JOB2","G1",True)
+infra.create_inputport("JOB2","G1",False)
 infra.create_outputport("JOB2","O1",1)
 
 """JOB3"""
@@ -28,8 +26,7 @@ infra.create_link("JOB1","JOB2","G1")
 infra.create_link("JOB2","JOB3","G1")
 
 """ADDING INPUTS"""
-infra.feed_input("JOB1","G1",[2,2])
-infra.feed_input("JOB1","G2",[5])
+infra.feed_input("JOB1","G1",[1])
 
 """SIMULATING NODES"""
 infra.simulate_onenode("JOB1")
