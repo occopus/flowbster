@@ -81,10 +81,15 @@ def input_file_deploy(confinp,confapp,directory):
                 log.error("No content, nor url(s) are defined in job for file: "+filename+" !")
             log.debug("- inputfile: "+filename)
 
-def input_files_link(inputdir,input_filenames,sandboxdir,input_names):
-    for index, ifile in enumerate(input_filenames):
-        os.symlink(os.path.join(inputdir,ifile),os.path.join(sandboxdir,input_names[index]))
-
+def input_files_link(inputdir,input_fileindexes,sandboxdir,input_filenames):
+    print "SYMLINK:",inputdir,input_fileindexes,sandboxdir,input_filenames
+    for index, ifilename in enumerate(input_filenames):
+        if type(ifilename) is list:
+            for onefilename in ifilename:
+                os.symlink(os.path.join(inputdir,onefilename),os.path.join(sandboxdir,onefilename))
+        else:
+            ifileininputdir = ifilename+"_"+str(input_fileindexes[index])
+            os.symlink(os.path.join(inputdir,ifileininputdir),os.path.join(sandboxdir,ifilename))
     return
 
 def create_executable(confapp,directory):
@@ -118,15 +123,24 @@ def deploy_input_descr(jobdir,descr):
     return
 
 def gen_input_filenames(input_descr):
+    #print input_descr
     ifnames = []
     for index,item in enumerate(input_descr['names']):
-        ifnames.append(item+"_"+str(input_descr['indexes'][index]))
+        if type(input_descr['indexes']['inp_file_indxs'][index]) is list:
+            newlist=[]
+            for collitem in input_descr['indexes']['inp_file_indxs'][index]:
+                newlist.append(item+"_"+str(collitem))
+            ifnames.append(newlist)
+        else:
+            collitem = input_descr['indexes']['inp_file_indxs'][index]    
+            ifnames.append(item)
+            #ifnames.append(item+"_"+str(collitem))
     return ifnames
 
 def gen_jobdir(input_descr):
     jobdir_name = "R_job"
     for index,item in enumerate(input_descr['names']):
-        jobdir_name+="_"+str(input_descr['indexes'][index])
+        jobdir_name+="_"+str(input_descr['indexes']['inp_file_indxs'][index])
     return jobdir_name
 
 def deploy(wfid,input_descr,confapp):
@@ -152,7 +166,7 @@ def deploy(wfid,input_descr,confapp):
         log.critical("Application is not defined. No content, no url found!")
         sys.exit(1)
 
-    input_files_link(get_inputdir(wfid),input_descr['files'],sandboxdir,input_descr['names'])
+    input_files_link(get_inputdir(wfid),input_descr['indexes']['inp_file_indxs'],sandboxdir,input_descr['files'])
 
     deploy_input_descr(jobdir,input_descr)
 
@@ -167,7 +181,6 @@ def deploy_jobs(wfid,confapp):
     input_descr = {}
     input_descr['names']=input_names
     input_descr['lengths']=input_lengths
-    input_descr['jobcount']=nDimColl.getMaxSize()
     input_descr['wfid']=wfid
     while (input_indexes):
         input_descr['indexes']=input_indexes
@@ -192,11 +205,25 @@ def input_set_default(input_item):
     if 'index' not in input_item.keys():
         input_item['index']=0
         input_item['count']=1
+    if 'index_list' not in input_item.keys():
+        input_item['index_list']=[input_item['index']]
+        input_item['count_list']=[input_item['count']]
+    #print "DEFAULT:",input_item
+
+def input_is_collector(portname):
+    isColl = False
+    for inputitem in confapp['inputs']:
+        if inputitem['name'] == portname and 'collector' in inputitem and inputitem['collector']:
+            isColl = True
+    #print "PORT:",portname,"COLL:",isColl
+    return isColl
 
 def input_register(input_item):
+    #print "INPUT_ITEM:",input_item
     if not nDimColl.checkDimExists(input_item['name']):
-        nDimColl.addDim(input_item['name'],input_item['count'],nDimColl.getNumOfDim())
-    nDimColl.addItem(input_item['name'],input_item['index'])
+        isColl = input_is_collector(input_item['name'])
+        nDimColl.addDim(input_item['name'],input_item['count'],nDimColl.getNumOfDim(),isColl,input_item['count_list'])
+    nDimColl.addItem(input_item['name'],input_item['index'],input_item['index_list'])
     return
 
 routepath = "/jobflow"
