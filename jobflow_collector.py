@@ -26,9 +26,16 @@ def save_a_file(directory,name,content):
     fo.close()
     return fullpath
 
+def gen_filename_by_index(name,indexlist):
+    filename = name
+    for i in indexlist:
+        filename = filename + "_" + str(i)
+    return filename
+
 def create_input_files(confjob,directory):
     for d in confjob['inputs']:
-        filename = d['name']+"_"+str(d['index'])
+        filename = gen_filename_by_index(d['name'],d['index_list'])
+        #filename = d['name']+"_"+str(d['index'])
         log.debug("- file to save: \""+filename+"\"")
         if os.path.exists(os.path.join(directory,filename)):
             log.warning("- file \""+filename+"\" already exists! Renaming...")
