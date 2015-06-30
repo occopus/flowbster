@@ -81,12 +81,12 @@ def input_file_deploy(confinp,confapp,directory):
                 log.error("No content, nor url(s) are defined in job for file: "+filename+" !")
             log.debug("- inputfile: "+filename)
 
-def input_files_link(inputdir,input_fileindexes,sandboxdir,input_filenames):
-    print "SYMLINK:",inputdir,input_fileindexes,sandboxdir,input_filenames
+def input_files_link(inputdir,input_names,input_fileindexes,sandboxdir,input_filenames):
     for index, ifilename in enumerate(input_filenames):
         if type(ifilename) is list:
-            for onefilename in ifilename:
-                os.symlink(os.path.join(inputdir,onefilename),os.path.join(sandboxdir,onefilename))
+            for subindex,onefilename in enumerate(ifilename):
+                ifileininputdir = input_names[index]+"_"+str(input_fileindexes[index][subindex])
+                os.symlink(os.path.join(inputdir,ifileininputdir),os.path.join(sandboxdir,onefilename))
         else:
             ifileininputdir = ifilename+"_"+str(input_fileindexes[index])
             os.symlink(os.path.join(inputdir,ifileininputdir),os.path.join(sandboxdir,ifilename))
@@ -177,7 +177,7 @@ def deploy(wfid,input_descr,confapp):
         log.critical("Application is not defined. No content, no url found!")
         sys.exit(1)
 
-    input_files_link(get_inputdir(wfid),input_descr['indexes']['inp_file_indxs'],sandboxdir,input_descr['files'])
+    input_files_link(get_inputdir(wfid),input_descr['names'],input_descr['indexes']['inp_file_indxs'],sandboxdir,input_descr['files'])
 
     deploy_input_descr(jobdir,input_descr)
 
