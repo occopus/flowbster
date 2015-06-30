@@ -52,11 +52,15 @@ def forward_outputs(jobdir):
             genfiles = readconfig(os.path.join(jobdir,genfilename))
         else:
             log.debug("Creating list of generated files for \""+out["name"]+"\"")
-            fullpath = os.path.join(jobdir,"sandbox",out["name"])
+            if "filter" in out:
+                fullpath = os.path.join(jobdir,"sandbox",out["filter"])
+            else:
+                fullpath = os.path.join(jobdir,"sandbox",out["name"])
             generated_files = glob.glob(fullpath)
+            generated_files.sort()
             genfiles = {}
             genfiles['count'] = len(generated_files)
-            genfiles['files'] = [ {"index":ind,"name":os.path.basename(x)} for ind,x in enumerate(generated_files) ]
+            genfiles['files'] = [ {"index":outind,"name":os.path.basename(x)} for outind,x in enumerate(generated_files) ]
             save_a_file(jobdir,genfilename,yaml.dump(genfiles,default_flow_style=False))
         log.debug("Num of generated files for \""+out["name"]+"\" is "+str(genfiles['count']))
 
@@ -69,6 +73,17 @@ def forward_outputs(jobdir):
             save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
         log.debug("Target forward count for link "+str(ind)+" is "+str(target_forward['count']))
 
+        if os.path.exists(os.path.join(jobdir,'inputs.yaml')):
+            inputsyaml = readconfig(os.path.join(jobdir,'inputs.yaml'))
+            index_list = inputsyaml['indexes']['out_file_indxs']
+            count_list = inputsyaml['indexes']['out_file_maxs']
+        else:
+            index_list = [0]
+            count_list = [1]
+        log.debug("INDEXLIST:"+str(index_list))
+        log.debug("COUNTLIST:"+str(count_list))
+
+
         for one_genfile in genfiles['files']:
             log.debug("Preparing sending "+str(one_genfile)+" to link "+str(ind))
             
@@ -80,8 +95,17 @@ def forward_outputs(jobdir):
             content['inputs'] = []
             one_input = {}
             one_input['name'] = out["targetname"]
-            one_input['index'] = one_genfile['index']
-            one_input['count'] = genfiles['count']
+            one_input['index_list'] = index_list+[one_genfile['index']]
+            one_input['count_list'] = count_list+[genfiles['count']]
+            itemcount=1
+            for i in range(len(one_input['count_list'])):
+                itemcount=itemcount*one_input['count_list'][i]
+            itemindex=one_genfile['index']
+            for i in range(len(one_input['count_list'])-2,-1,-1):
+                itemindex=itemindex+(one_input['count_list'][i+1]*one_input['index_list'][i])
+            one_input['count_list']
+            one_input['index'] = itemindex
+            one_input['count'] = itemcount
             with open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'r') as fo:
                 one_input['content'] = fo.read()
             content['inputs'].append(one_input)
