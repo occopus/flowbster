@@ -4,8 +4,6 @@ import subprocess
 import logging
 import logging.config
 import time
-
-
 import glob
 
 def readconfig(pathtoconfig):
@@ -21,8 +19,9 @@ def save_a_file(directory,name,content):
 
 def perform_exec(sandboxdir,exename,arguments):
     os.chdir(sandboxdir)
-    log.info(" - run: \""+exename+' '+arguments+' >../stdout 2>../stderr')
-    status = subprocess.call('./'+exename+' '+arguments+' >../stdout 2>../stderr',shell=True)
+    command = "./"+exename+" "+arguments+" >../stdout 2>../stderr"
+    log.info(" - run: \""+command+"\"")
+    status = subprocess.call(command,shell=True)
     save_a_file('..','retcode',str(status))
 
 def find_job_to_run(jobdirroot):
@@ -73,9 +72,9 @@ else:
     loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
 
 while True:
-    #try:
+    try:
         if exec_one_job()==False:
             time.sleep(confsys['sleepinterval']) 
-    #except BaseException:
-    #    log.exception("EXCEPTION:")
+    except BaseException:
+        log.exception("EXCEPTION:")
 
