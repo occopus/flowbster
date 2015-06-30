@@ -99,22 +99,22 @@ class ndimTester:
                         psgen = self.s['outputportgen'][srcnodeid][0]
                         if psgen == 1:
                             maxitems = len(hl)
-                            trg.addDim(portname,len(hl),pindex,isColl,hl[0]['om'])
+                            trg.addDim(portname,len(hl),pindex,isColl,hl[0]['out_file_maxs'])
                             for hlindex,hlitem in enumerate(hl):
-                                trg.addItem(portname,hlindex,hlitem['oi'])
+                                trg.addItem(portname,hlindex,hlitem['out_file_indxs'])
                             self.s['simulated'][nindex][pindex] = True
                         else:
                             maxitems = len(hl) * psgen
-                            maxindexes = hl[0]['om'][:]
+                            maxindexes = hl[0]['out_file_maxs'][:]
                             maxindexes.append(psgen)
                             hlindex = 0
                             trg.addDim(portname,maxitems,pindex,isColl,maxindexes)
                             L=[0] * maxitems
                             for hlitem in hl:
-                                maxindexes = hlitem['om'][:]
+                                maxindexes = hlitem['out_file_maxs'][:]
                                 maxindexes.append(psgen)
                                 for i in range(psgen):
-                                    indexes = hlitem['oi'][:]
+                                    indexes = hlitem['out_file_indxs'][:]
                                     indexeslen = len(indexes)
                                     indexes.append(i)
                                     L[hlindex]=indexes
@@ -133,8 +133,8 @@ class ndimTester:
                 numofrun = len(hl)
                 print "-> run: ",numofrun
                 print "-> res: ",numofrun*self.s['outputportgen'][index][0]
-                print "-> runlist: "
-                pprint.pprint(hl)
+                #print "-> runlist: "
+                #pprint.pprint(hl)
                 
 
 
