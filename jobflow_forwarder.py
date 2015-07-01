@@ -80,16 +80,12 @@ def forward_outputs(jobdir):
         else:
             index_list = [0]
             count_list = [1]
-        log.debug("INDEXLIST:"+str(index_list))
-        log.debug("COUNTLIST:"+str(count_list))
-
 
         for one_genfile in genfiles['files']:
-            log.debug("Preparing sending "+str(one_genfile)+" to link "+str(ind))
-            
             if one_genfile['index'] < target_forward['count']:
                 continue
-       
+            
+            log.debug("Preparing sending "+str(one_genfile)+" to link "+str(ind))
             content = {}   
             content['wfid'] = str(inputs['wfid'])
             content['inputs'] = []
