@@ -219,6 +219,11 @@ def input_set_default(input_item):
     if 'index_list' not in input_item.keys():
         input_item['index_list']=[input_item['index']]
         input_item['count_list']=[input_item['count']]
+    else:
+        lastindex = len(input_item['count_list'])-1
+        if lastindex>0 and input_item['count_list'][lastindex] == 1:
+            del input_item['index_list'][-1]
+            del input_item['count_list'][-1]
     #print "DEFAULT:",input_item
 
 def input_is_collector(portname):
