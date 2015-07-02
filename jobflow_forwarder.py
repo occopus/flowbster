@@ -132,7 +132,7 @@ def forward_one_output():
         log.info("Found output to forward at \""+jobdir+"\"")
         forward_outputs(jobdir)
         log.info("Forward finished.")
-        return False
+        return True
     else:
         log.info("No output found to be forwarded.")
         return False
