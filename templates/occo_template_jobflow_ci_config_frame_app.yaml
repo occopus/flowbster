@@ -5,10 +5,13 @@
             tgzURL: {{variables.jobflow.app.exe.tgzurl}}
         inputs: {% for item in variables.jobflow.app.in %}
             -
-                name: {{item.name}} {% endfor %}
+                name: {{item.name}} {% if item.collector is defined %}
+                collector: {{item.collector}} {% endif %} {% if item.format is defined %}
+                format: {{item.format}} {% endif %} {% endfor %}
         outputs: {% for item in variables.jobflow.app.out %}
             -
-                name: {{item.name}}
+                name: {{item.name}} {% if item.filter is defined %}
+                filter: {{item.filter}} {% endif %} 
                 targetname: {{item.targetname}} {% if item.targetnode is defined %}
                 targeturl: http://{{ibget('node.resource.address', find_node_id(item.targetnode))}}:{{variables.jobflow_global.receiver_port}}/jobflow {% else %}
                 targeturl: http://{{item.targetip}}:{{item.targetport}}/jobflow {% endif %} {% endfor %}
