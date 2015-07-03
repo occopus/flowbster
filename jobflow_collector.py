@@ -34,6 +34,7 @@ def gen_filename_by_index(name,indexlist):
 
 def create_input_files(confjob,directory):
     for d in confjob['inputs']:
+        log.debug("- indexes: normal: "+str(d['index'])+" list: "+str(d['index_list']))
         filename = gen_filename_by_index(d['name'],d['index_list'])
         #filename = d['name']+"_"+str(d['index'])
         log.debug("- file to save: \""+filename+"\"")
