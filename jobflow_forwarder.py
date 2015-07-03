@@ -56,6 +56,7 @@ def forward_outputs(jobdir):
                 fullpath = os.path.join(jobdir,"sandbox",out["filter"])
             else:
                 fullpath = os.path.join(jobdir,"sandbox",out["name"])
+            log.debug("Filter is: \""+fullpath+"\"")
             generated_files = glob.glob(fullpath)
             generated_files.sort()
             genfiles = {}
@@ -81,6 +82,10 @@ def forward_outputs(jobdir):
             index_list = [0]
             count_list = [1]
 
+        log.debug("Index list: "+str(index_list))
+        log.debug("Count list: "+str(count_list))
+        log.debug("Genfiles: "+str(genfiles))
+
         for one_genfile in genfiles['files']:
             if one_genfile['index'] < target_forward['count']:
                 continue
@@ -91,15 +96,24 @@ def forward_outputs(jobdir):
             content['inputs'] = []
             one_input = {}
             one_input['name'] = out["targetname"]
-            one_input['index_list'] = index_list+[one_genfile['index']]
-            one_input['count_list'] = count_list+[genfiles['count']]
+            
+            if genfiles['count'] > 1:
+                one_input['index_list'] = index_list+[one_genfile['index']]
+                one_input['count_list'] = count_list+[genfiles['count']]
+            else:
+                one_input['index_list'] = index_list
+                one_input['count_list'] = count_list
+            
             itemcount=1
             for i in range(len(one_input['count_list'])):
                 itemcount=itemcount*one_input['count_list'][i]
-            itemindex=one_genfile['index']
-            for i in range(len(one_input['count_list'])-2,-1,-1):
-                itemindex=itemindex+(one_input['count_list'][i+1]*one_input['index_list'][i])
-            one_input['count_list']
+            
+            multiplier = 1
+            itemindex = 0
+            for i in range(len(one_input['index_list'])-1,-1,-1):
+                itemindex =  itemindex + one_input['index_list'][i] * multiplier
+                multiplier = multiplier * one_input['count_list'][i]
+            
             one_input['index'] = itemindex
             one_input['count'] = itemcount
             with open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'r') as fo:
