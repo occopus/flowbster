@@ -77,6 +77,10 @@ def input_file_deploy(confinp,confapp,directory):
                 os.chown(untarred,pwd.getpwnam('root').pw_uid,pwd.getpwnam('root').pw_gid)
             elif 'url' in confinp:
                 download_a_file(confinp['url'],os.path.join(directory,filename))
+            elif 'post_file' in confinp:
+                f = request.files[k['name']]
+                log.info('Saving file ' + filename + ' to ' + os.path.join(directory,filename))
+                f.save(os.path.join(directory,filename))
             else:
                 log.error("No content, nor url(s) are defined in job for file: "+filename+" !")
             log.debug("- inputfile: "+filename)
@@ -165,7 +169,7 @@ def deploy(wfid,input_descr,confapp):
     create_dir(jobdir)
 
     log.debug("- jobinput files: "+str(input_descr['files']))
-    
+
     sandboxdir = os.path.join(jobdir,"sandbox")
     create_dir(sandboxdir)
 
@@ -182,7 +186,7 @@ def deploy(wfid,input_descr,confapp):
     deploy_input_descr(jobdir,input_descr)
 
     pass_to_executor(wfiddir,input_descr['jobdir'])
-    
+
     log.info("Job deployment finished.")
 
 def deploy_jobs(wfid,confapp):
@@ -250,8 +254,9 @@ app = Flask(__name__)
 @app.route(routepath,methods=['POST'])
 def receive():
     log.info("New input(s) arrived.")
-    rdata = request.get_data()
-    confjob = yaml.load(rdata)
+    yaml_param = request.args.get('yaml', '')
+    rdata = request.files[yaml_param]
+    confjob = yaml.load(rdata.read())
     wfid = confjob['wfid']
     wfdir = get_wfdir(wfid)
     create_dir(wfdir)
@@ -277,7 +282,3 @@ log.info("Listening on port "+str(confsys['listeningport'])+", under url \""+rou
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=confsys['listeningport'])
-
-
-
-

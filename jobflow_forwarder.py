@@ -1,5 +1,6 @@
 import requests
 import yaml
+import uuid
 import os,sys,stat
 import logging
 import logging.config
@@ -16,14 +17,6 @@ def save_a_file(directory,name,content):
     fo.write(content);
     fo.close()
     return fullpath
-
-def perform_sending_content(url,content):
-    try:
-        r = requests.post(url, data=yaml.dump(content))
-    except:
-        log.exception('')
-        return False
-    return True
 
 def find_output_to_forward(jobdirroot):
     dirs = glob.glob(os.path.join(jobdirroot,"*/F_*"))
@@ -42,10 +35,10 @@ def mark_job_as_forwarded(jobdir):
 def forward_outputs(jobdir):
     inputs = readconfig(os.path.join(jobdir,"inputs.yaml"))
     outputs = confapp["outputs"]
-    
+
     forward_finished = True
     for ind, out in enumerate(outputs):
-        
+
         genfilename = "genfiles-"+out["name"]+".yaml"
         if os.path.exists(os.path.join(jobdir,genfilename)):
             log.debug("Loading list of generated files for \""+out["name"]+"\"")
@@ -89,52 +82,55 @@ def forward_outputs(jobdir):
         for one_genfile in genfiles['files']:
             if one_genfile['index'] < target_forward['count']:
                 continue
-            
+
             log.debug("Preparing sending "+str(one_genfile)+" to link "+str(ind))
             content = {}   
             content['wfid'] = str(inputs['wfid'])
             content['inputs'] = []
             one_input = {}
             one_input['name'] = out["targetname"]
-            
+
             if genfiles['count'] > 1:
                 one_input['index_list'] = index_list+[one_genfile['index']]
                 one_input['count_list'] = count_list+[genfiles['count']]
             else:
                 one_input['index_list'] = index_list
                 one_input['count_list'] = count_list
-            
+
             itemcount=1
             for i in range(len(one_input['count_list'])):
                 itemcount=itemcount*one_input['count_list'][i]
-            
+
             multiplier = 1
             itemindex = 0
             for i in range(len(one_input['index_list'])-1,-1,-1):
                 itemindex =  itemindex + one_input['index_list'][i] * multiplier
                 multiplier = multiplier * one_input['count_list'][i]
-            
+
             one_input['index'] = itemindex
             one_input['count'] = itemcount
-            with open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'r') as fo:
-                one_input['content'] = fo.read()
+            one_input['post_file'] = out['targetname']
             content['inputs'].append(one_input)
             url = out["targeturl"]
-          
+
             log.info("Sending content for \""+out.get("targetname")+"\" to \""+url+"\"")
             log.debug("Content is: \n"+str(content))
-            success = perform_sending_content(url,content)
-            if success:
-                target_forward['count']+=1
-                save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
-                log.info("Sending: SUCCESS.")
-            else:
+            try:
+                yaml_id = str(uuid.uuid4())
+                payload = {'yaml': yaml_id}
+                files = {out["targetname"]: open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'rb'), yaml_id: yaml.dump(content)}
+                r = requests.post(url, params=payload, files=files)
+            except:
+                log.exception('')
                 log.info("Sending: FAILED. Will retry later.")
                 forward_finished = False
                 break
+            target_forward['count']+=1
+            save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
+            log.info("Sending: SUCCESS.")
     if forward_finished:
         mark_job_as_forwarded(jobdir)
-        
+
     return True
 
 
@@ -170,4 +166,3 @@ else:
 while True:
     if forward_one_output()==False :
         time.sleep(confsys['sleepinterval'])
-

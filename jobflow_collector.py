@@ -19,13 +19,6 @@ def get_jobdirroot():
 def create_dir(path):
     if not os.path.exists(path): os.makedirs(path)
 
-def save_a_file(directory,name,content):
-    fullpath = os.path.join(directory,name)
-    fo = open(fullpath, "wb")
-    fo.write(content);
-    fo.close()
-    return fullpath
-
 def gen_filename_by_index(name,indexlist):
     filename = name
     for i in indexlist:
@@ -40,17 +33,18 @@ def create_input_files(confjob,directory):
         log.debug("- file to save: \""+filename+"\"")
         if os.path.exists(os.path.join(directory,filename)):
             log.warning("- file \""+filename+"\" already exists! Renaming...")
-            ind = 1 
+            ind = 1
             while os.path.exists(os.path.join(directory,filename+"."+str(ind))):
                 ind+=1
             filename = filename+"."+str(ind)
-        save_a_file(directory, filename ,d['content'])
+        f = request.files[d['name']]
+        f.save(os.path.join(directory,filename))
         log.debug("- file saved as \""+filename+"\"")
 
 def deploy(confjob):
     wfidstr = confjob['wfid']
     log.debug("- wfid: "+wfidstr)
-  
+
     wfiddir = os.path.join(get_jobdirroot(),wfidstr)
     if os.path.exists(wfiddir):
         log.debug("- directory already exists...")
@@ -68,11 +62,12 @@ def loadconfig(sysconfpath):
 
 routepath = "/jobflow"
 app = Flask(__name__)
- 
+
 @app.route(routepath,methods=['POST'])
 def receive():
     log.info("New file(s) arrived.")
-    rdata = request.get_data()
+    yaml_param = request.args.get('yaml', '')
+    rdata = request.files[yaml_param].read()
     confjob = yaml.load(rdata)
     deploy(confjob)
     return "ok"
@@ -87,7 +82,3 @@ log.info("Listening on port "+str(confsys['listeningport-collector'])+", under u
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=confsys['listeningport-collector'])
-
-
-
-

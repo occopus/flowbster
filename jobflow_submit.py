@@ -1,6 +1,7 @@
 import requests
 import yaml
 import sys
+import uuid
 from datetime import datetime
 
 def printhelp():
@@ -9,7 +10,7 @@ def printhelp():
     print "  url : endpoint of a jobflow_receiver component"
 
 def parse_arguments():
-    if len(sys.argv)!=3:
+    if len(sys.argv) < 3:
         print "Wrong number of arguments!"
         printhelp()
         return (False,False)
@@ -29,12 +30,20 @@ if path:
     except Exception as e:
         print "Error when reading file: %s" % e
         sys.exit(1)
-        
+
     #content = add_time_stamp_to_wfid(content)
 
+    files = {}
+    for arg in sys.argv[3:]:
+        print "Adding input file: " + arg
+        files[arg] = open(arg, 'rb')
+    print 'Files: ' + str(files)
+    yaml_id = str(uuid.uuid4())
+    payload = {'yaml': yaml_id}
+    files[yaml_id] = yaml.dump(content)
+
     try:
-        requests.post(url, data=yaml.dump(content))
+        requests.post(url, files=files, params=payload)
     except requests.exceptions.RequestException as e:
         print "Error when posting message: %s" % e
         sys.exit(1)
-
