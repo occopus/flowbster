@@ -251,8 +251,10 @@ def input_register(input_item):
 routepath = "/jobflow"
 app = Flask(__name__)
  
-@app.route(routepath,methods=['POST'])
+@app.route(routepath,methods=['GET','POST','HEAD'])
 def receive():
+    if request.method in ['GET','HEAD']:
+        return "OK"
     log.info("New input(s) arrived.")
     yaml_param = request.args.get('yaml', '')
     rdata = request.files[yaml_param]
