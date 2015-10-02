@@ -19,7 +19,7 @@ def save_a_file(directory,name,content):
 
 def perform_exec(sandboxdir,exename,arguments):
     os.chdir(sandboxdir)
-    command = "./"+exename+" "+arguments+" >../stdout 2>../stderr"
+    command = "./"+exename+" "+str(arguments)+" >../stdout 2>../stderr"
     log.info(" - run: \""+command+"\"")
     status = subprocess.call(command,shell=True)
     save_a_file('..','retcode',str(status))
@@ -47,7 +47,7 @@ def exec_one_job():
     if jobdir:
         log.info("NEW JOB to execute at \""+jobdir+"\"")
         log.debug(" - exe: "+exename)
-        log.debug(" - args: "+arguments)
+        log.debug(" - args: "+str(arguments))
         sandboxdir = os.path.join(jobdir,'sandbox')
         perform_exec(sandboxdir,exename,arguments)
         jobdir = pass_to_forwarder(jobdir)
