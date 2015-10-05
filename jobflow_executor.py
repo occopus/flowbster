@@ -30,10 +30,12 @@ def find_job_to_run(jobdirroot):
         jobdir = dirs[0]
         exename = confapp['executable']['filename']
         if 'arguments' in confapp:
-            arguments = str(confapp['arguments')
+            arguments = confapp['arguments']
+            if arguments == None:
+                arguments = ''
         else:
             arguments = ''
-        return (jobdir,exename,arguments)
+        return (jobdir,exename,str(arguments))
     else:
         return (False,False,False)
 
