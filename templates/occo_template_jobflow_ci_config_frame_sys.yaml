@@ -1,9 +1,5 @@
 #cloud-config
 
-users:
-    - gecos: Jobflow Application
-      name: jobflow
-
 packages:
     - python
     - python-pip
@@ -11,29 +7,29 @@ packages:
 runcmd:
     - pip install Flask
     - pip install wget
-    - /home/jobflow/jobflow-run.sh
-    - echo "* * * * * root /home/jobflow/jobflow-run.sh" >> /etc/cron.d/jobflow
+    - /usr/bin/jobflow-run.sh
+    - echo "* * * * * root /usr/bin/jobflow-run.sh" >> /etc/cron.d/jobflow
 
 write_files:
     - permissions: '0644'
       content: "contentS:jobflow_receiver.py"
-      path: /home/jobflow/jobflow_receiver.py
+      path: /usr/bin/jobflow_receiver.py
     
     - permissions: '0644'
       content: "contentS:ndimCollector.py"
-      path: /home/jobflow/ndimCollector.py
+      path: /usr/bin/ndimCollector.py
     
     - permissions: '0644'
       content: "contentS:jobflow_executor.py"
-      path: /home/jobflow/jobflow_executor.py
+      path: /usr/bin/jobflow_executor.py
 
     - permissions: '0644'
       content: "contentS:jobflow_forwarder.py"
-      path: /home/jobflow/jobflow_forwarder.py
+      path: /usr/bin/jobflow_forwarder.py
     
     - permissions: '0744'
       content: "contentS:jobflow-run.sh"
-      path: /home/jobflow/jobflow-run.sh
+      path: /usr/bin/jobflow-run.sh
 
     - permissions: '0644'
       content: "contentT:occo_jobflow-config-sys.yaml"
