@@ -113,11 +113,14 @@ def forward_outputs(jobdir):
             one_input['post_file'] = out['targetname']
             content['inputs'].append(one_input)
             r = out['targetip']
-            targetiplist = [x.encode('ascii', 'ignore').split("'")[1] for x in r]
-            if 'distribution' in out:
-                distr = out['distribution']
-                if 'random' == distr:
-                    targetiplist = [targetiplist[random.randint(0, len(targetiplist)-1)]]
+            if isinstance(r, list):
+                targetiplist = [x.encode('ascii', 'ignore').split("'")[1] for x in r]
+                if 'distribution' in out:
+                    distr = out['distribution']
+                    if 'random' == distr:
+                        targetiplist = [targetiplist[random.randint(0, len(targetiplist)-1)]]
+            else:
+                targetiplist = [r]
             log.info('Will send file to ips: {}'.format(targetiplist))
             log.debug("Content is: \n"+str(content))
 
