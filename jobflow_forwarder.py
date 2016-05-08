@@ -6,6 +6,7 @@ import logging
 import logging.config
 import time
 import glob
+import random
 
 def readconfig(pathtoconfig):
     with open(pathtoconfig, 'r') as f:
@@ -111,20 +112,28 @@ def forward_outputs(jobdir):
             one_input['count'] = itemcount
             one_input['post_file'] = out['targetname']
             content['inputs'].append(one_input)
-            url = out["targeturl"]
-
-            log.info("Sending content for \""+out.get("targetname")+"\" to \""+url+"\"")
+            r = out['targetip']
+            targetiplist = [x.encode('ascii', 'ignore').split("'")[1] for x in r]
+            if 'distribution' in out:
+                distr = out['distribution']
+                if 'random' == distr:
+                    targetiplist = [targetiplist[random.randint(0, len(targetiplist)-1)]]
+            log.info('Will send file to ips: {}'.format(targetiplist))
             log.debug("Content is: \n"+str(content))
-            try:
-                yaml_id = str(uuid.uuid4())
-                payload = {'yaml': yaml_id}
-                files = {out["targetname"]: open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'rb'), yaml_id: yaml.dump(content)}
-                r = requests.post(url, params=payload, files=files)
-            except:
-                log.exception('')
-                log.info("Sending: FAILED. Will retry later.")
-                forward_finished = False
-                break
+
+            for targetip in targetiplist:
+                try:
+                    url = 'http://' + targetip + ':' + str(out['targetport']) + '/jobflow'
+                    log.info("Sending content for \""+out.get("targetname")+"\" to \""+url+"\"")
+                    yaml_id = str(uuid.uuid4())
+                    payload = {'yaml': yaml_id}
+                    files = {out["targetname"]: open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'rb'), yaml_id: yaml.dump(content)}
+                    r = requests.post(url, params=payload, files=files)
+                except:
+                    log.exception('')
+                    log.info("Sending: FAILED. Will retry later.")
+                    forward_finished = False
+                    break
             target_forward['count']+=1
             save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
             log.info("Sending: SUCCESS.")

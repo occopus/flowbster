@@ -11,9 +11,10 @@
         outputs: {% for item in variables.jobflow.app.out %}
             -
                 name: {{item.name}} {% if item.filter is defined %}
-                filter: {{item.filter}} {% endif %} 
-                targetname: {{item.targetname}} {% if item.targetnode is defined %}
-                targeturl: http://{{ibget('node.resource.address', find_node_id(item.targetnode))}}:{{variables.jobflow_global.receiver_port}}/jobflow {% else %}
-                targeturl: http://{{item.targetip}}:{{item.targetport}}/jobflow {% endif %} {% endfor %}
+                filter: {{item.filter}} {% endif %}
+                targetname: {{item.targetname}} {% if item.distribution is defined %}
+                distribution: {{item.distribution}} {% endif %}
+                targetip  : {% if item.targetnode is defined %}{{getipall(item.targetnode)}}{% else %}{{item.targetip}}{% endif %}
+                targetport: {{variables.jobflow_global.receiver_port}} {% endfor %}
         arguments: {{variables.jobflow.app.args}}
   path: /etc/jobflow-config-app.yaml
