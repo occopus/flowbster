@@ -28,10 +28,10 @@ if path:
         file = open(path,'r')
         content = yaml.load(file)
     except Exception as e:
-        print "Error when reading file: %s" % e
+        print "Error when reading file: {0!s}".format(e)
         sys.exit(1)
 
-    #content = add_time_stamp_to_wfid(content)
+    content = add_time_stamp_to_wfid(content)
 
     files = {}
     for arg in sys.argv[3:]:
@@ -45,5 +45,5 @@ if path:
     try:
         requests.post(url, files=files, params=payload)
     except requests.exceptions.RequestException as e:
-        print "Error when posting message: %s" % e
+        print "Error when posting message: {0!s}".format(e)
         sys.exit(1)
