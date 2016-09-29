@@ -137,8 +137,8 @@ def forward_outputs(jobdir):
                     r = requests.post(url, params=payload, files=files)
                     target_forward['ips'].append(targetip)
                 except:
-                    log.exception('')
-                    log.info("Sending: "+str(targetip)+" on port "+str(targetport)+" is inaccessible. Will retry later.")
+                    log.exception('Exception occured during sending content:')
+                    log.info("Sending: "+str(targetip)+" on port "+str(out['targetport'])+" is inaccessible. Will retry later.")
                     forward_finished = False
             if forward_finished:
                 target_forward['portcount']+=1
@@ -151,8 +151,9 @@ def forward_outputs(jobdir):
                 break
     if forward_finished:
         mark_job_as_forwarded(jobdir)
-
-    return True
+        return True
+    else:
+        return False
 
 
 
@@ -161,9 +162,9 @@ def forward_one_output():
     jobdir = find_output_to_forward(jobdirroot)
     if jobdir:
         log.info("Found output to forward at \""+jobdir+"\"")
-        forward_outputs(jobdir)
+        ret = forward_outputs(jobdir)
         log.info("Forward finished.")
-        return True
+        return ret
     else:
         log.info("No output found to be forwarded.")
         return False
