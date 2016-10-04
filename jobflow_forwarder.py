@@ -64,9 +64,10 @@ def forward_outputs(jobdir):
             target_forward = readconfig(target_forward_count_filename)
         else:
             target_forward = {}
-            target_forward['count'] = 0
+            target_forward['portcount'] = 0
+            target_forward['ips'] = []
             save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
-        log.debug("Target forward count for link "+str(ind)+" is "+str(target_forward['count']))
+        log.debug("Target forward count for link "+str(ind)+" is "+str(target_forward['portcount']))
 
         if os.path.exists(os.path.join(jobdir,'inputs.yaml')):
             inputsyaml = readconfig(os.path.join(jobdir,'inputs.yaml'))
@@ -81,7 +82,7 @@ def forward_outputs(jobdir):
         log.debug("Genfiles: "+str(genfiles))
 
         for one_genfile in genfiles['files']:
-            if one_genfile['index'] < target_forward['count']:
+            if one_genfile['index'] < target_forward['portcount']:
                 continue
 
             log.debug("Preparing sending "+str(one_genfile)+" to link "+str(ind))
@@ -125,6 +126,8 @@ def forward_outputs(jobdir):
             log.debug("Content is: \n"+str(content))
 
             for targetip in targetiplist:
+                if targetip in target_forward['ips']:
+                    continue
                 try:
                     url = 'http://' + targetip + ':' + str(out['targetport']) + '/jobflow'
                     log.info("Sending content for \""+out.get("targetname")+"\" to \""+url+"\"")
@@ -132,18 +135,25 @@ def forward_outputs(jobdir):
                     payload = {'yaml': yaml_id}
                     files = {out["targetname"]: open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'rb'), yaml_id: yaml.dump(content)}
                     r = requests.post(url, params=payload, files=files)
+                    target_forward['ips'].append(targetip)
                 except:
-                    log.exception('')
-                    log.info("Sending: FAILED. Will retry later.")
+                    log.exception('Exception occured during sending content:')
+                    log.info("Sending: "+str(targetip)+" on port "+str(out['targetport'])+" is inaccessible. Will retry later.")
                     forward_finished = False
-                    break
-            target_forward['count']+=1
-            save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
-            log.info("Sending: SUCCESS.")
+            if forward_finished:
+                target_forward['portcount']+=1
+                target_forward['ips']=[]
+                save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
+                log.info("Sending: SUCCESS.")
+            else:
+                save_a_file(jobdir,target_forward_count_filename,yaml.dump(target_forward,default_flow_style=False))
+                log.info("Sending: FAILED. Will retry later.")
+                break
     if forward_finished:
         mark_job_as_forwarded(jobdir)
-
-    return True
+        return True
+    else:
+        return False
 
 
 
@@ -152,9 +162,9 @@ def forward_one_output():
     jobdir = find_output_to_forward(jobdirroot)
     if jobdir:
         log.info("Found output to forward at \""+jobdir+"\"")
-        forward_outputs(jobdir)
+        ret = forward_outputs(jobdir)
         log.info("Forward finished.")
-        return True
+        return ret
     else:
         log.info("No output found to be forwarded.")
         return False
