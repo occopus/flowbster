@@ -1,5 +1,0 @@
-APP_EXE_NAME: exe.bin
-APP_EXE_TGZURL: "http://mishra.lpds.sztaki.hu/edgidemo/download/jobflow/jobflow-app1.tgz"
-APP_INPUTS: [{"name":"one_file"},{"name":"two_file"}]
-APP_OUTPUTS: [{"name":"out_file","targetname":"one_file","targeturl":"http://{{TARGETIP}}:{{TARGETPORT}}/jobflow"},{"name":"out_file","targetname":"two_file","targeturl":"http://{{TARGETIP}}:{{TARGETPORT}}/jobflow"}]
-APP_ARGUMENTS: "one_file two_file out_file"
