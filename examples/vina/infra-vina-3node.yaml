@@ -1,9 +1,9 @@
-infra_name: autodock-3node
-user_id: zfarkas@sztaki.hu
+infra_name: autodock-vina-3node
+user_id: yourname@gmail.com
 
 variables:
     flowbster_global:
-            collector_ip: &collectorip 192.168.153.200
+            collector_ip: &collectorip UNDEFINED
             collector_port: &collectorport 5001
             receiver_port: &receiverport 5000
 
@@ -19,7 +19,7 @@ nodes:
                 app:
                     exe:
                         filename: execute.bin
-                        tgzurl: https://www.dropbox.com/s/2l3pkmxfb8k6wsc/generator_exe.tgz?dl=1
+                        tgzurl: https://github.com/occopus/flowbster/raw/master/examples/vina/bin/vina_exe.tgz
                     args: '64'
                     in:
                         -
@@ -34,17 +34,17 @@ nodes:
                             filter: "output.zip*"
                             distribution: random
                             targetname: ligands.zip
-                            targetnode: Vina
+                            targetnode: VINE
                         -
                             name: config.txt
                             targetname: config.txt
-                            targetnode: Vina
+                            targetnode: VINA
                         -
                             name: receptor.pdbqt
                             targetname: receptor.pdbqt
-                            targetnode: Vina
-    - &Vina
-        name: Vina
+                            targetnode: VINA
+    - &VINA
+        name: VINA
         type: flowbster_node
         scaling:
                 min: 1
@@ -54,7 +54,7 @@ nodes:
                 app:
                     exe:
                         filename: vina.run
-                        tgzurl: https://www.dropbox.com/s/d7xyrrkiej1xhw6/vina_exe.tgz?dl=1
+                        tgzurl: https://github.com/occopus/flowbster/raw/master/examples/vina/bin/vina_exe.tgz
                     args: ''
                     in:
                         -
@@ -79,7 +79,7 @@ nodes:
                 app:
                     exe:
                         filename: execute.bin
-                        tgzurl: https://www.dropbox.com/s/rf9h5kppah2y4s5/collector_exe.tgz?dl=1
+                        tgzurl: https://github.com/occopus/flowbster/raw/master/examples/vina/bin/collector_exe.tgz
                     args: '5'
                     in:
                         -
@@ -95,6 +95,6 @@ nodes:
 
 dependencies:
     -
-        connection: [ *GENERATOR, *Vina ]
+        connection: [ *GENERATOR, *VINA ]
     -
-        connection: [ *Vina, *COLLECTOR ]
+        connection: [ *VINA, *COLLECTOR ]
