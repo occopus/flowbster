@@ -1,0 +1,5 @@
+wfid: unique-id-of-the-wf
+inputs:
+    -
+        name: text
+        post_file: text
