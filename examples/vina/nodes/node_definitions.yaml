@@ -1,0 +1,16 @@
+'node_def:flowbster_node':
+    -
+        resource:
+            type: ec2
+            endpoint: http://cfe2.lpds.sztaki.hu:4567
+            regionname: ROOT
+            image_id: ami-00001441
+            instance_type: m1.small
+        contextualisation:
+            type: cloudinit
+            context_template: !text_import
+                url: file://cloud_init_flowbster_node.yaml
+        health_check:
+            ping: False
+            urls:
+                -  http://{{ip}}:5000/flowbster

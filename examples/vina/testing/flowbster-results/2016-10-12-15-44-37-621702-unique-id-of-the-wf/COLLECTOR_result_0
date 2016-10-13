@@ -1,0 +1,75 @@
+MODEL 1
+REMARK VINA RESULT:      -1.1      0.000      0.000
+REMARK  6 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: N_1  and  C_17 
+REMARK    2  A    between atoms: C_6  and  O_13 
+REMARK    3  A    between atoms: O_13  and  C_14 
+REMARK    4  A    between atoms: C_14  and  C_15 
+REMARK    5  A    between atoms: C_15  and  C_16 
+REMARK    6  A    between atoms: C_16  and  C_17 
+ROOT
+HETATM    1 CL   LIG     2      50.134  64.752  52.620  1.00  0.00     0.000 Cl
+ENDROOT
+TORSDOF 6
+ENDMDL
+MODEL 1
+REMARK VINA RESULT:      -1.1      0.000      0.000
+REMARK  6 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: N_1  and  C_17 
+REMARK    2  A    between atoms: C_6  and  O_13 
+REMARK    3  A    between atoms: O_13  and  C_14 
+REMARK    4  A    between atoms: C_14  and  C_15 
+REMARK    5  A    between atoms: C_15  and  C_16 
+REMARK    6  A    between atoms: C_16  and  C_17 
+ROOT
+HETATM    1 CL   LIG     2      50.137  64.749  52.620  1.00  0.00     0.000 Cl
+ENDROOT
+TORSDOF 6
+ENDMDL
+MODEL 1
+REMARK VINA RESULT:      -1.1      0.000      0.000
+REMARK  6 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: N_1  and  C_17 
+REMARK    2  A    between atoms: C_6  and  O_13 
+REMARK    3  A    between atoms: O_13  and  C_14 
+REMARK    4  A    between atoms: C_14  and  C_15 
+REMARK    5  A    between atoms: C_15  and  C_16 
+REMARK    6  A    between atoms: C_16  and  C_17 
+ROOT
+HETATM    1 CL   LIG     2      50.137  64.749  52.620  1.00  0.00     0.000 Cl
+ENDROOT
+TORSDOF 6
+ENDMDL
+MODEL 1
+REMARK VINA RESULT:      -1.1      0.000      0.000
+REMARK  6 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: N_1  and  C_17 
+REMARK    2  A    between atoms: C_6  and  O_13 
+REMARK    3  A    between atoms: O_13  and  C_14 
+REMARK    4  A    between atoms: C_14  and  C_15 
+REMARK    5  A    between atoms: C_15  and  C_16 
+REMARK    6  A    between atoms: C_16  and  C_17 
+ROOT
+HETATM    1 CL   LIG     2      50.134  64.752  52.620  1.00  0.00     0.000 Cl
+ENDROOT
+TORSDOF 6
+ENDMDL
+MODEL 1
+REMARK VINA RESULT:      -1.1      0.000      0.000
+REMARK  6 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: N_1  and  C_17 
+REMARK    2  A    between atoms: C_6  and  O_13 
+REMARK    3  A    between atoms: O_13  and  C_14 
+REMARK    4  A    between atoms: C_14  and  C_15 
+REMARK    5  A    between atoms: C_15  and  C_16 
+REMARK    6  A    between atoms: C_16  and  C_17 
+ROOT
+HETATM    1 CL   LIG     2      50.137  64.749  52.620  1.00  0.00     0.000 Cl
+ENDROOT
+TORSDOF 6
+ENDMDL
