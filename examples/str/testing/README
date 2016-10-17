@@ -1,0 +1,11 @@
+
+
+STEP 1: START COLLECTING:
+~/flowbster/scripts/v0.1/flowbster-collector.sh -s
+
+STEP 2: SUBMIT:
+~/flowbster/scripts/v0.1/flowbster-submit.sh -h <ip of UPPER node> -i input-description-for-str.yaml -d text 
+
+STEP 3: FINISH COLLECTING:
+~/flowbster/scripts/v0.1/flowbster-collector.sh -d
+
