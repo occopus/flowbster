@@ -19,18 +19,19 @@ nodes:
                 app:
                     exe:
                         filename: do_upper.sh
-                        tgzurl: https://github.com/occopus/flowbster/raw/master/examples/str/bin/do_upper.sh
-                    args: '64'
+                        tgzurl: https://github.com/occopus/flowbster/raw/master/examples/str/bin/do_upper.sh.tgz
+                    args: ''
                     in:
                         -
                             name: text
                     out:
                         -
                             name: upper
-                            targetnode: STAT
                             targetname: text
+                            targetnode: STAT
                         -
                             name: upper
+                            targetname: upper
                             targetip: *collectorip
                             targetport: *collectorport
     - &STAT
@@ -44,7 +45,7 @@ nodes:
                 app:
                     exe:
                         filename: do_statistics.sh
-                        tgzurl: https://github.com/occopus/flowbster/raw/master/examples/str/bin/do_statistics.sh
+                        tgzurl: https://github.com/occopus/flowbster/raw/master/examples/str/bin/do_statistics.sh.tgz
                     args: ''
                     in:
                         -
@@ -52,6 +53,7 @@ nodes:
                     out:
                         -
                             name: stat
+                            targetname: stat
                             targetip: *collectorip
                             targetport: *collectorport
 dependencies:
