@@ -130,7 +130,7 @@ def forward_outputs(jobdir):
                     continue
                 try:
                     url = 'http://' + targetip + ':' + str(out['targetport']) + '/flowbster'
-                    log.info("Sending content for \""+out.get("targetname")+"\" to \""+url+"\"")
+                    log.info("Sending content for \""+str(out.get("targetname"))+"\" to \""+url+"\"")
                     yaml_id = str(uuid.uuid4())
                     payload = {'yaml': yaml_id}
                     files = {out["targetname"]: open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'rb'), yaml_id: yaml.dump(content)}
