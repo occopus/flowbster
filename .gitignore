@@ -3,5 +3,6 @@
 *.py[cod]
 *.log
 *.pid
+*.swp
 
 
