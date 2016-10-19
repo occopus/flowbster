@@ -78,7 +78,7 @@ def input_file_deploy(confinp,confapp,directory):
             elif 'url' in confinp:
                 download_a_file(confinp['url'],os.path.join(directory,filename))
             elif 'post_file' in confinp:
-                f = request.files[k['post_file']]
+                f = request.files[confinp['post_file']]
                 log.info('Saving file ' + filename + ' to ' + os.path.join(directory,filename))
                 f.save(os.path.join(directory,filename))
             else:
