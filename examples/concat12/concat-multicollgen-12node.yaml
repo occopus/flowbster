@@ -1,0 +1,274 @@
+user_id: yourname@gmail.com
+infra_name: concat-multicollgen-12node
+variables:
+  flowbster_global:
+    collector_ip:  &collectorip  UNDEFINED
+    collector_port:  &collectorport 5001 
+    receiver_port:  &receiverport 5000 
+nodes:
+  - &SPLITTER
+    name: SPLITTER
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -o out_file' 
+          in:
+            - name: in_file
+          out:
+            - name: out_file
+              targetname:   
+            - name: out_file
+              targetname: in_file
+              targetnode: GEN1
+            - name: out_file
+              targetname: in_file
+              targetnode: NORMAL1
+  - &MULTIGEN1
+    name: MULTIGEN1
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename:   cg.sh 
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -o out_file -m out_file_ -c 3' 
+          in:
+            - name: in_file
+          out:
+            - name: out_file
+              filter: "out_file_*"
+              targetname: in_file
+              targetnode: MULTIGEN2
+  - &MULTIGEN2
+    name: MULTIGEN2
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -o out_file -m out_file_ -c 5' 
+          in:
+            - name: in_file
+          out:
+            - name: out_file
+              filter: "out_file_*"
+              targetname: in_file_1
+              targetnode: MERGER
+  - &GEN1
+    name: GEN1
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -o out_file' 
+          in:
+            - name: in_file
+          out:
+            - name: out_file
+              targetname: in_file
+              targetnode: GEN2
+  - &GEN2
+    name: GEN2
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -o out_file -m out_file_ -c 5' 
+          in:
+            - name: in_file
+          out:
+            - name: out_file
+              filter: "out_file_*"
+              targetname: in_file_2
+              targetnode: MERGER
+  - &NORMAL1
+    name: NORMAL1
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -o out_file' 
+          in:
+            - name: in_file
+          out:
+            - name: out_file
+              targetname: in_file_3
+              targetnode: MERGER
+  - &MERGER
+    name: MERGER
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file_1 -o out_file' 
+          in:
+            - name: in_file_1
+            - name: in_file_2
+            - name: in_file_3
+          out:
+            - name: out_file
+              targetname: in_file
+              targetnode: MUTLICOLL1
+            - name: out_file
+              targetname: in_file
+              targetnode: COLL1
+            - name: out_file
+              targetname: in_file
+              targetnode: NORMAL2
+  - &MUTLICOLL1
+    name: MUTLICOLL1
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -f in_file_ -o out_file' 
+          in:
+            - name: in_file
+              collector: true
+              format: "in_file_%i"
+          out:
+            - name: out_file
+              targetname: in_file
+              targetnode: MULTICOLL2
+  - &MULTICOLL2
+    name: MULTICOLL2
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -f in_file_ -o out_file' 
+          in:
+            - name: in_file
+              collector: true
+              format: "in_file_%i"
+          out:
+            - name: out_file
+              targetname: MULTICOLL2_out
+              targetip:  *collectorip 
+              targetport:  *collectorport 
+  - &COLL1
+    name: COLL1
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -f in_file_ -o out_file' 
+          in:
+            - name: in_file
+              collector: true
+              format: "in_file_%i"
+          out:
+            - name: out_file
+              targetname: in_file
+              targetnode: COLL2
+  - &COLL2
+    name: COLL2
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -o out_file' 
+          in:
+            - name: in_file
+          out:
+            - name: out_file
+              targetname: COLL2_out
+              targetip:  *collectorip 
+              targetport:  *collectorport 
+  - &NORMAL2
+    name: NORMAL2
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: cg.sh
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat12/bin/jobflow-cg.tgz 
+          args:  '-i in_file -o out_file' 
+          in:
+            - name: in_file
+          out:
+            - name: out_file
+              targetname: NORMAL2_out
+              targetip:  *collectorip 
+              targetport:  *collectorport 
+dependencies:
+  -  connection: [ *MULTIGEN1, *MULTIGEN2 ] 
+  -  connection: [ *SPLITTER, *GEN1 ] 
+  -  connection: [ *SPLITTER, *NORMAL1 ] 
+  -  connection: [ *GEN1, *GEN2 ] 
+  -  connection: [ *MULTIGEN2, *MERGER ] 
+  -  connection: [ *GEN2, *MERGER ] 
+  -  connection: [ *NORMAL1, *MERGER ] 
+  -  connection: [ *MERGER, *MUTLICOLL1 ] 
+  -  connection: [ *MERGER, *COLL1 ] 
+  -  connection: [ *MERGER, *NORMAL2 ] 
+  -  connection: [ *MUTLICOLL1, *MULTICOLL2 ] 
+  -  connection: [ *COLL1, *COLL2 ] 

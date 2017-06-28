@@ -1,0 +1,26 @@
+'node_def:flowbster_node':
+    -
+        resource:
+            type: cloudsigma
+            endpoint: https://zrh.cloudsigma.com/api/2.0
+            libdrive_id: dcdab115-0572-4fab-a14a-6df67a570d6a
+            description:
+                cpu: 2048
+                mem: 1073741824
+                vnc_password: secret
+                pubkeys:
+                    -
+                        ef312d37-e383-4e77-a90b-d0f3e83701f9
+                nics:
+                    -
+                        firewall_policy: fd97e326-83c8-44d8-90f7-0a19110f3c9d
+                        ip_v4_conf:
+                            conf: dhcp
+        contextualisation:
+            type: cloudinit
+            context_template: !text_import
+                url: file://cloud_init_flowbster_node.yaml
+        health_check:
+            ping: False
+            urls:
+                -  http://{{ip}}:5000/flowbster

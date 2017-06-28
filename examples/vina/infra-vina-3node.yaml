@@ -19,7 +19,7 @@ nodes:
                 app:
                     exe:
                         filename: execute.bin
-                        tgzurl: https://github.com/occopus/flowbster/raw/master/examples/vina/bin/vina_exe.tgz
+                        tgzurl: https://github.com/occopus/flowbster/raw/master/examples/vina/bin/generator_exe.tgz
                     args: '64'
                     in:
                         -
@@ -34,7 +34,7 @@ nodes:
                             filter: "output.zip*"
                             distribution: random
                             targetname: ligands.zip
-                            targetnode: VINE
+                            targetnode: VINA
                         -
                             name: config.txt
                             targetname: config.txt

@@ -1,0 +1,8 @@
+STEP 1: START COLLECTING:
+~/flowbster/scripts/v0.1/flowbster-collector.sh -s
+
+STEP 2: SUBMIT:
+~/flowbster/scripts/v0.1/flowbster-submit.sh -h <ip of node> -i input-for-concat-collgen-1node.yaml 
+
+STEP 3: FINISH COLLECTING:
+~/flowbster/scripts/v0.1/flowbster-collector.sh -d
