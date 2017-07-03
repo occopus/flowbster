@@ -1,0 +1,11 @@
+#!/bin/bash
+infile1="$1"
+infile2="$2"
+outfile="$3"
+
+cat "$infile1" "$infile2" > "$outfile"
+echo "This is stdout."
+echo "This is stderr." >&2
+
+sleep 1
+

@@ -1,0 +1,14 @@
+
+wfid: unique-id-of-the-wf
+inputs:
+    -
+        name: one_file
+        content: |
+            one: lorem ipsum
+            one: dolor
+    -
+        name: two_file
+        content: |
+            two: sit amet
+            two: luna
+

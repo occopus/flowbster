@@ -1,0 +1,103 @@
+user_id: yourname@gmail.com
+infra_name: concat-simple-4node
+variables:
+  flowbster_global:
+    collector_ip:  &collectorip UNDEFINED
+    collector_port:  &collectorport 5001 
+    receiver_port:  &receiverport 5000 
+nodes:
+  - &SPLITTER
+    name: SPLITTER
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: exe.bin
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat4/bin/jobflow-app1.tgz 
+          args:  'one_file two_file out_file' 
+          in:
+            - name: one_file
+            - name: two_file
+          out:
+            - name: out_file
+              targetname: one_file
+              targetnode: CONCAT_A
+            - name: out_file
+              targetname: two_file
+              targetnode: CONCAT_A
+            - name: out_file
+              targetname: one_file
+              targetnode: CONCAT_B
+            - name: out_file
+              targetname: two_file
+              targetnode: CONCAT_B
+  - &CONCAT_A
+    name: CONCAT_A
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: exe.bin
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat4/bin/jobflow-app1.tgz 
+          args:  'one_file two_file out_file' 
+          in:
+            - name: one_file
+            - name: two_file
+          out:
+            - name: out_file
+              targetname: one_file
+              targetnode: MERGER
+  - &CONCAT_B
+    name: CONCAT_B
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: exe.bin
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat4/bin/jobflow-app1.tgz 
+          args:  'one_file two_file out_file' 
+          in:
+            - name: one_file
+            - name: two_file
+          out:
+            - name: out_file
+              targetname: two_file
+              targetnode: MERGER
+  - &MERGER
+    name: MERGER
+    type: flowbster_node
+    scaling:
+      min: 1
+      max: 1
+    variables:
+      flowbster:
+        app:
+          exe:
+            filename: exe.bin
+            tgzurl:  https://github.com/occopus/flowbster/raw/master/examples/concat4/bin/jobflow-app1.tgz 
+          args:  'one_file two_file out_file' 
+          in:
+            - name: one_file
+            - name: two_file
+          out:
+            - name: out_file
+              targetname: MERGER_result
+              targetip:  *collectorip 
+              targetport:  *collectorport 
+dependencies:
+  -  connection: [ *SPLITTER, *CONCAT_A ] 
+  -  connection: [ *SPLITTER, *CONCAT_B ] 
+  -  connection: [ *CONCAT_A, *MERGER ] 
+  -  connection: [ *CONCAT_B, *MERGER ] 

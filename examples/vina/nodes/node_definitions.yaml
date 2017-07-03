@@ -4,7 +4,7 @@
             type: ec2
             endpoint: http://cfe2.lpds.sztaki.hu:4567
             regionname: ROOT
-            image_id: ami-00001441
+            image_id: ami-00001363
             instance_type: m1.small
         contextualisation:
             type: cloudinit

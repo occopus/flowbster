@@ -1,0 +1,9 @@
+
+wfid: unique-id-of-the-wf
+inputs:
+    -
+        name: in_file
+        content: |
+            one: lorem ipsum
+            one: dolor
+
