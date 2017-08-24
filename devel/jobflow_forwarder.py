@@ -81,6 +81,7 @@ def forward_outputs(jobdir):
         log.debug("Count list: "+str(count_list))
         log.debug("Genfiles: "+str(genfiles))
 
+        oidx = 0
         for one_genfile in genfiles['files']:
             if one_genfile['index'] < target_forward['portcount']:
                 continue
@@ -115,11 +116,14 @@ def forward_outputs(jobdir):
             content['inputs'].append(one_input)
             r = out['targetip']
             if isinstance(r, list):
-                targetiplist = [x.encode('ascii', 'ignore').split("'")[1] for x in r]
+                targetiplist = [x.encode('ascii', 'ignore').split("'")[1] if x[0] == 'u' else x for x in r]
                 if 'distribution' in out:
                     distr = out['distribution']
                     if 'random' == distr:
                         targetiplist = [targetiplist[random.randint(0, len(targetiplist)-1)]]
+                    if 'round-robin' == distr:
+                        targetiplist = [targetiplist[oidx % len(targetiplist)]]
+                        oidx += 1
             else:
                 targetiplist = [r]
             log.info('Will send file to ips: {}'.format(targetiplist))
