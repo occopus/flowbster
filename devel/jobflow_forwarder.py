@@ -133,8 +133,8 @@ def forward_outputs(jobdir):
                 if targetip in target_forward['ips']:
                     continue
                 try:
-                    url = 'http://' + targetip + ':' + str(out['targetport']) + '/jobflow'
-                    log.info("Sending content for \""+out.get("targetname")+"\" to \""+url+"\"")
+                    url = 'http://' + targetip + ':' + str(out['targetport']) + '/flowbster'
+                    log.info("Sending content for \""+str(out.get("targetname"))+"\" to \""+url+"\"")
                     yaml_id = str(uuid.uuid4())
                     payload = {'yaml': yaml_id}
                     files = {out["targetname"]: open(os.path.join(jobdir,"sandbox",one_genfile['name']), 'rb'), yaml_id: yaml.dump(content)}
@@ -180,14 +180,14 @@ def loadconfig(sysconfpath):
     jobdirroot = os.path.join(confsys['jobdirroot'])
     if not os.path.exists(jobdirroot): os.makedirs(jobdirroot)
     logging.config.dictConfig(confsys['logging'])
-    log = logging.getLogger("jobflow.forwarder")
+    log = logging.getLogger("flowbster.forwarder")
     confapp = readconfig(confsys['appconfigpath'])
 
 
 if len(sys.argv)==3 and sys.argv[1]=="-c":
     loadconfig(sys.argv[2])
 else:
-    loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
+    loadconfig(os.path.join('/etc','flowbster-config-sys.yaml'))
 
 while True:
     if forward_one_output()==False :
