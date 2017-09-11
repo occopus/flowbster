@@ -78,7 +78,7 @@ def input_file_deploy(confinp,confapp,directory):
             elif 'url' in confinp:
                 download_a_file(confinp['url'],os.path.join(directory,filename))
             elif 'post_file' in confinp:
-                f = request.files[k['name']]
+                f = request.files[confinp['post_file']]
                 log.info('Saving file ' + filename + ' to ' + os.path.join(directory,filename))
                 f.save(os.path.join(directory,filename))
             else:
@@ -210,7 +210,7 @@ def loadconfig(sysconfpath):
     global confsys, app, confapp, routepath, log, nDimColl
     confsys = readconfig(sysconfpath)
     log = logging.config.dictConfig(confsys['logging'])
-    log = logging.getLogger("jobflow.receiver")
+    log = logging.getLogger("flowbster.receiver")
     create_dir(confsys['jobdirroot'])
     set_jobdirroot(confsys['jobdirroot'])
     confapp = readconfig(confsys['appconfigpath'])
@@ -248,7 +248,7 @@ def input_register(input_item):
     nDimColl.addItem(input_item['name'],input_item['index'],input_item['index_list'])
     return
 
-routepath = "/jobflow"
+routepath = "/flowbster"
 app = Flask(__name__)
  
 @app.route(routepath,methods=['GET','POST','HEAD'])
@@ -276,7 +276,7 @@ def receive():
 if len(sys.argv)==3 and sys.argv[1]=="-c":
     loadconfig(sys.argv[2])
 else:
-    loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
+    loadconfig(os.path.join('/etc','flowbster-config-sys.yaml'))
 
 log.info("App config: "+confsys['appconfigpath'])
 log.info("Job directory: "+get_jobdirroot())
