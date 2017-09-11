@@ -57,10 +57,10 @@ def loadconfig(sysconfpath):
     global confsys, app, confapp, routepath, log
     confsys = readconfig(sysconfpath)
     log = logging.config.dictConfig(confsys['logging'])
-    log = logging.getLogger("jobflow.collector")
-    set_jobdirroot(confsys['jobdirroot-collector'])
+    log = logging.getLogger("flowbster.gather")
+    set_jobdirroot(confsys['jobdirroot-gather'])
 
-routepath = "/jobflow"
+routepath = "/flowbster"
 app = Flask(__name__)
 
 @app.route(routepath,methods=['POST'])
@@ -75,10 +75,10 @@ def receive():
 if len(sys.argv)==3 and sys.argv[1]=="-c":
     loadconfig(sys.argv[2])
 else:
-    loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
+    loadconfig(os.path.join('/etc','flowbster-config-sys.yaml'))
 
 log.info("Job directory: "+get_jobdirroot())
-log.info("Listening on port "+str(confsys['listeningport-collector'])+", under url \""+routepath+"\"")
+log.info("Listening on port "+str(confsys['listeningport-gather'])+", under url \""+routepath+"\"")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0',port=confsys['listeningport-collector'])
+    app.run(host='0.0.0.0',port=confsys['listeningport-gather'])
