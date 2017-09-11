@@ -3,8 +3,8 @@ user_id: yourname@gmail.com
 
 variables:
     flowbster_global:
-            collector_ip: &collectorip UNDEFINED
-            collector_port: &collectorport 5001
+            gather_ip: &gatherip UNDEFINED
+            gather_port: &gatherport 5001
             receiver_port: &receiverport 5000
 
 nodes:
@@ -20,7 +20,7 @@ nodes:
                     exe:
                         filename: execute.bin
                         tgzurl: https://github.com/occopus/flowbster/raw/master/examples/vina/bin/generator_exe.tgz
-                    args: '64'
+                    args: '240'
                     in:
                         -
                             name: input-ligands.zip
@@ -90,8 +90,8 @@ nodes:
                         -
                             name: best.pdbqt
                             targetname: COLLECTOR_result
-                            targetip: *collectorip
-                            targetport: *collectorport
+                            targetip: *gatherip
+                            targetport: *gatherport
 
 dependencies:
     -
