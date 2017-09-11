@@ -6,11 +6,11 @@ packages:
 runcmd:
 - pip install Flask
 - pip install wget
-- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.1/flowbster_receiver.py -O /usr/bin/flowbster_receiver.py
-- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.1/flowbster_executor.py -O /usr/bin/flowbster_executor.py
-- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.1/flowbster_forwarder.py -O /usr/bin/flowbster_forwarder.py
-- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.1/ndimCollector.py -O /usr/bin/ndimCollector.py
-- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.1/flowbster-run.sh -O /usr/bin/flowbster-run.sh
+- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.2/flowbster_receiver.py -O /usr/bin/flowbster_receiver.py
+- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.2/flowbster_executor.py -O /usr/bin/flowbster_executor.py
+- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.2/flowbster_forwarder.py -O /usr/bin/flowbster_forwarder.py
+- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.2/ndimCollector.py -O /usr/bin/ndimCollector.py
+- wget -nc https://github.com/occopus/flowbster/raw/master/deploy/v0.2/flowbster-run.sh -O /usr/bin/flowbster-run.sh
 - chmod u+x /usr/bin/flowbster-run.sh
 - echo "* * * * * root /usr/bin/flowbster-run.sh" >> /etc/cron.d/flowbster
 - /usr/bin/flowbster-run.sh
