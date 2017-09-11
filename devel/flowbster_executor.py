@@ -68,13 +68,13 @@ def loadconfig(sysconfpath):
     jobdirroot = os.path.join(confsys['jobdirroot'])
     if not os.path.exists(jobdirroot): os.makedirs(jobdirroot)
     logging.config.dictConfig(confsys['logging'])
-    log = logging.getLogger("jobflow.executor")
+    log = logging.getLogger("flowbster.executor")
     confapp = readconfig(confsys['appconfigpath'])
 
 if len(sys.argv)==3 and sys.argv[1]=="-c":
     loadconfig(sys.argv[2])
 else:
-    loadconfig(os.path.join('/etc','jobflow-config-sys.yaml'))
+    loadconfig(os.path.join('/etc','flowbster-config-sys.yaml'))
 
 while True:
     try:
