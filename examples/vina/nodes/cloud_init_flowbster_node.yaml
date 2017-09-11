@@ -20,8 +20,8 @@ write_files:
     jobdirroot: /var/flowbster/jobs/
     listeningport: {{variables.flowbster_global.receiver_port}}
     appconfigpath: /etc/flowbster-config-app.yaml
-    jobdirroot-collector: /var/flowbster/results/
-    listeningport-collector: {{variables.flowbster_global.collector_port}}
+    jobdirroot-gather: /var/flowbster/results/
+    listeningport-gather: {{variables.flowbster_global.gather_port}}
     logging:
         version: 1
         root:
