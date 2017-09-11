@@ -5,9 +5,9 @@ import uuid
 from datetime import datetime
 
 def printhelp():
-    print "Usage: jobflow_submitter [file] [url]"
-    print "  file: containing jobflow definition"
-    print "  url : endpoint of a jobflow_receiver component"
+    print "Usage: flowbster_feeder [file] [url]"
+    print "  file: containing flowbster definition"
+    print "  url : endpoint of a flowbster_receiver component"
 
 def parse_arguments():
     if len(sys.argv) < 3:
@@ -31,7 +31,7 @@ if path:
         print "Error when reading file: %s" % e
         sys.exit(1)
 
-    #content = add_time_stamp_to_wfid(content)
+    content = add_time_stamp_to_wfid(content)
 
     files = {}
     for arg in sys.argv[3:]:
