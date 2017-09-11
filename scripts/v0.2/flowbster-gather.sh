@@ -35,7 +35,7 @@ case $key in
             rm -f $PIDFILE
         fi
     fi
-    python $GATHER_BIN -c $CONFFILE &
+    python $GATHER_BIN &
     echo $! > $PIDFILE
     touch $LOGFILE
     tail -f $LOGFILE
