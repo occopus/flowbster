@@ -1,0 +1,11 @@
+wfid: my_unique-id-of-the-wf
+inputs:
+    -
+        name: portA
+        post_file: file-to-send-to-portA.txt
+    -
+        name: portB
+        post_file: file-to-send-to-portB.txt
+    -
+        name: portC
+        post_file: file-to-send-to-portC.txt
