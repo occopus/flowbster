@@ -2,6 +2,8 @@
 
 mkdir -p /var/log/flowbster
 
+# We assume the config files are present, but if not, we try to read them
+# as a base64-encoded string from environment variables
 if [ ! -e /etc/flowbster-config-sys.yaml ]; then
     [ -z "$FLOWBSTER_SYS_CFG" ] && echo "Variable FLOWBSTER_SYS_CFG is not set!" && exit 1
     [ -z "$FLOWBSTER_APP_CFG" ] && echo "Variable FLOWBSTER_APP_CFG is not set!" && exit 1
@@ -51,8 +53,10 @@ else
     fi
 fi
 
+# Check if running inside a Docker container, and exit if not
 [ ! -f /.dockerenv ] && exit 0
 
+# Keep the script running inside Docker
 while true; do
     sleep 60
 done
