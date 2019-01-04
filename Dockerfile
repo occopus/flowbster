@@ -1,10 +1,10 @@
-FROM ubuntu:latest
+FROM alpine:latest
 
 MAINTAINER Zoltán Farkas
 
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get install -y python python-pip zip coreutils cron
+RUN apk update
+RUN apk upgrade
+RUN apk add zip coreutils dcron py2-pip bash
 RUN pip install --upgrade pip
 RUN pip install Flask wget PyYAML requests
 ADD devel/* /usr/bin/
