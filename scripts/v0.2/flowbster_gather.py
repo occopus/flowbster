@@ -6,7 +6,7 @@ import logging as log
 
 DEF_HOST = '0.0.0.0'
 DEF_PORT = 5001
-DEF_RESDIR = 'flowbster-results'
+DEF_RESDIR = '/tmp/flowbster/results'
 DEF_ROUTEPATH = "/flowbster"
 DEF_LOGFILE = "flowbster-gather.log"
 DEF_LOGLEVEL = log.DEBUG
@@ -65,7 +65,7 @@ def receive():
     deploy(confjob)
     return "ok"
 
-log.info("Result directory: "+DEF_RESDIR)
+log.info("Storing results into directory: "+DEF_RESDIR)
 log.info("Listening on port "+str(DEF_PORT)+", under url \""+DEF_ROUTEPATH+"\"")
 
 if __name__ == "__main__":
